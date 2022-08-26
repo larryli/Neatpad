@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Win32 Resource
+*.res
+
+# Pelles c
+*.ppx
+*.tag
