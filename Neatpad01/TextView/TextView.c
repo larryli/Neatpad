@@ -12,10 +12,21 @@
 #include "TextView.h"
 #include "TextViewInternal.h"
 
+TEXTVIEW *TextView__new(HWND hwnd)
+{
+    TEXTVIEW *ptv = malloc(sizeof(TEXTVIEW));
+    if (ptv == NULL)
+        return NULL;
+    ptv->m_hWnd = hwnd;
+    return ptv;
+}
+
+void TextView__delete(TEXTVIEW *ptv) { free(ptv); }
+
 //
 //	Painting procedure for TextView objects
 //
-LRESULT WINAPI TextView_OnPaint(TEXTVIEW *ptv)
+LRESULT WINAPI TextView__OnPaint(TEXTVIEW *ptv)
 {
     HDC hdc;
     PAINTSTRUCT ps;
@@ -54,9 +65,8 @@ LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
     // and store pointer to it in our extra-window-bytes
     case WM_NCCREATE:
 
-        if ((ptv = malloc(sizeof(TEXTVIEW))) == NULL)
+        if ((ptv = TextView__new(hwnd)) == NULL)
             return FALSE;
-        ptv->m_hWnd = hwnd;
 
         SetWindowLong(hwnd, 0, (LONG)ptv);
         return TRUE;
@@ -64,12 +74,12 @@ LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
     // Last message received by any window - delete the TextView object
     case WM_NCDESTROY:
 
-        free(ptv);
+        TextView__delete(ptv);
         return 0;
 
     // Draw contents of TextView whenever window needs updating
     case WM_PAINT:
-        return TextView_OnPaint(ptv);
+        return TextView__OnPaint(ptv);
 
     default:
         break;

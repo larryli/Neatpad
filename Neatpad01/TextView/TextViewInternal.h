@@ -6,6 +6,8 @@ typedef struct TextView {
     int x;
 } TEXTVIEW;
 
-LRESULT WINAPI TextView_OnPaint(TEXTVIEW *);
+TEXTVIEW *TextView__new(HWND hwnd);
+void TextView__delete(TEXTVIEW *ptv);
+LRESULT WINAPI TextView__OnPaint(TEXTVIEW *ptv);
 
 #endif
