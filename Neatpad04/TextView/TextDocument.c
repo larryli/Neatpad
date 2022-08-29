@@ -92,7 +92,7 @@ BOOL TextDocument__init_linebuffer(TEXTDOCUMENT *ptd)
     // loop through every byte in the file
     for (i = 0; i < ptd->length;) {
         // carriage-return
-        if (ptd->buffer[i++] == '\r') {
+        if (ptd->buffer[i] == '\r') {
             i++;
 
             // carriage-return / line-feed combination
