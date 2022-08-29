@@ -6,9 +6,9 @@
 //	NOTES:		www.catch22.net
 //
 #define _WIN32_WINNT 0x400
+#include <tchar.h>
 #include <windows.h>
 
-#include <tchar.h>
 
 #include "TextView.h"
 #include "TextViewInternal.h"

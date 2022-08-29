@@ -5,9 +5,8 @@
 //
 //	NOTES:		www.catch22.net
 //
-#include <windows.h>
-
 #include <tchar.h>
+#include <windows.h>
 
 #include "TextView.h"
 #include "TextViewInternal.h"

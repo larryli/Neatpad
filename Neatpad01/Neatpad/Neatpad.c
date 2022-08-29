@@ -6,11 +6,10 @@
 //
 //	Freeware
 //
-
+#include <tchar.h>
 #include <windows.h>
 
 #include <commctrl.h>
-#include <tchar.h>
 
 #include "..\TextView\TextView.h"
 #include "resource.h"
