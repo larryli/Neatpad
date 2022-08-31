@@ -16,8 +16,8 @@
 //
 //	Dialogbox procedure for the FONT pane
 //
-BOOL CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
-                                    LPARAM lParam)
+INT_PTR CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
+                                       LPARAM lParam)
 {
     PSHNOTIFY *pshn;
 

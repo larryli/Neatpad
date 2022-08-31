@@ -356,7 +356,7 @@ LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
 
         if ((ptv = TextView__new(hwnd)) == NULL)
             return FALSE;
-        SetWindowLongPtr(hwnd, 0, (LONG)ptv);
+        SetWindowLongPtr(hwnd, 0, (LPARAM)ptv);
         return TRUE;
 
     // Last message received by any window - delete the TextView object

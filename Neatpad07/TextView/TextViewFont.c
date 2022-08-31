@@ -22,7 +22,7 @@ static const char *CtrlStr(DWORD ch)
     return ch < ' ' ? reps[ch] : "???";
 }
 
-void PaintRect(HDC hdc, RECT *rect, COLORREF fill)
+void PaintRectPoint(HDC hdc, RECT *rect, COLORREF fill)
 {
     fill = SetBkColor(hdc, fill);
 
@@ -172,7 +172,7 @@ int TextView__PaintCtrlChar(TEXTVIEW *ptv, HDC hdc, int xpos, int ypos,
 
     // paint the background white
     if (GetBkMode(hdc) == OPAQUE)
-        PaintRect(hdc, &rect, bg);
+        PaintRectPoint(hdc, &rect, bg);
 
     // adjust rectangle for first black block
     rect.right -= 1;
@@ -181,7 +181,7 @@ int TextView__PaintCtrlChar(TEXTVIEW *ptv, HDC hdc, int xpos, int ypos,
         rect.top + font->tm.tmHeight - font->nDescent - font->nInternalLeading;
 
     // paint the first black block
-    PaintRect(hdc, &rect, fg);
+    PaintRectPoint(hdc, &rect, fg);
 
     // prepare device context
     fg = SetTextColor(hdc, bg);

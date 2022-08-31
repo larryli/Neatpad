@@ -7,5 +7,8 @@ POC_WORKSPACE_VERSION = 1.00
 
 PROJECT = Neatpad\Neatpad.ppj
 PROJECT = TextView\TextView.ppj
+PROJECT = Neatpad\Neatpad64.ppj
+PROJECT = TextView\TextView64.ppj
 
 DEPENDENCY = Neatpad\Neatpad.ppj ON TextView\TextView.ppj
+DEPENDENCY = Neatpad\Neatpad64.ppj ON TextView\TextView64.ppj

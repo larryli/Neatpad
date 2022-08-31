@@ -487,13 +487,8 @@ void PaintRect(HDC hdc, int x, int y, int width, int height, COLORREF fill)
 {
     RECT rect = {x, y, x + width, y + height};
 
-    PaintRectPoint(hdc, &rect, fill);
-}
-
-void PaintRectPoint(HDC hdc, RECT *rect, COLORREF fill)
-{
     fill = SetBkColor(hdc, fill);
-    ExtTextOut(hdc, 0, 0, ETO_OPAQUE, rect, 0, 0, 0);
+    ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rect, 0, 0, 0);
     SetBkColor(hdc, fill);
 }
 

@@ -23,7 +23,7 @@ COLORREF LightenRGB(COLORREF rgbColor, int amt);
 static HFONT g_hBoldFont;
 static HFONT g_hNormalFont;
 static HICON g_hIcon1;
-//static int g_nFontHeight;
+// static int g_nFontHeight;
 
 static COLORREF g_crPreviewFG;
 static COLORREF g_crPreviewBG;
@@ -102,7 +102,7 @@ DWORD GetCurrentListData(HWND hwnd, UINT uCtrl)
 
 DWORD AddComboStringWithData(HWND hwnd, UINT uCtrl, TCHAR *szText, DWORD data)
 {
-    int idx = SendDlgItemMessage(hwnd, uCtrl, CB_ADDSTRING, 0, (LONG)szText);
+    int idx = SendDlgItemMessage(hwnd, uCtrl, CB_ADDSTRING, 0, (LPARAM)szText);
     return SendDlgItemMessage(hwnd, uCtrl, CB_SETITEMDATA, idx, data);
 }
 
@@ -273,9 +273,9 @@ BOOL FontCombo_DrawItem(HWND hwnd, DRAWITEMSTRUCT *dis)
     //	Get the item text
     //
     if (dis->itemID == -1)
-        SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LONG)szText);
+        SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LPARAM)szText);
     else
-        SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LONG)szText);
+        SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LPARAM)szText);
 
     //
     //	Set text colour and background based on current state
@@ -335,9 +335,9 @@ BOOL ColourCombo_DrawItem(HWND hwnd, UINT uCtrlId, DRAWITEMSTRUCT *dis,
     //	Get the item text
     //
     if (dis->itemID == -1)
-        SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LONG)szText);
+        SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LPARAM)szText);
     else
-        SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LONG)szText);
+        SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LPARAM)szText);
 
     //
     //	Set text colour and background based on current state
@@ -443,7 +443,7 @@ void InitSizeList(HWND hwnd)
 
     // enumerate font sizes
     EnumFontFamiliesEx(hdc, &lf, (FONTENUMPROC)EnumFontSizes,
-                       (LONG)GetDlgItem(hwnd, IDC_SIZELIST), 0);
+                       (LPARAM)GetDlgItem(hwnd, IDC_SIZELIST), 0);
 
     // set selection to first item
     count = SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_GETCOUNT, 0, 0);
@@ -502,14 +502,14 @@ void AddColourListItem(HWND hwnd, UINT uItem, int fgIdx, int bgIdx,
                        char *szName)
 {
     HWND hwndCtrl = GetDlgItem(hwnd, uItem);
-    int idx = SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LONG)szName);
+    int idx = SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LPARAM)szName);
     SendMessage(hwndCtrl, LB_SETITEMDATA, idx, MAKELONG(fgIdx, bgIdx));
 }
 
 void AddColourComboItem(HWND hwnd, UINT uItem, COLORREF col, char *szName)
 {
     HWND hwndCtrl = GetDlgItem(hwnd, uItem);
-    int idx = SendMessage(hwndCtrl, CB_ADDSTRING, 0, (LONG)szName);
+    int idx = SendMessage(hwndCtrl, CB_ADDSTRING, 0, (LPARAM)szName);
     SendMessage(hwndCtrl, CB_SETITEMDATA, idx, col);
 }
 
@@ -520,7 +520,8 @@ void UpdatePreviewPane(HWND hwnd)
     int size;
     DWORD data;
 
-    SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETLBTEXT, idx, (LONG)szFaceName);
+    SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETLBTEXT, idx,
+                       (LPARAM)szFaceName);
 
     size = GetDlgItemInt(hwnd, IDC_SIZELIST, 0, FALSE);
 
@@ -609,7 +610,7 @@ void SelectColorInList(HWND hwnd, UINT uComboIdx, short itemIdx)
 
         // if we didn't match the colour, add it as a custom entry
         if (i == NUM_DEFAULT_COLOURS) {
-            i = SendMessage(hwndCombo, CB_ADDSTRING, 0, (LONG) _T("Custom"));
+            i = SendMessage(hwndCombo, CB_ADDSTRING, 0, (LPARAM) _T("Custom"));
             SendMessage(hwndCombo, CB_SETITEMDATA, i,
                         g_rgbTempColourList[itemIdx]);
             SendMessage(hwndCombo, CB_SETCURSEL, i, 0);
@@ -668,13 +669,13 @@ BOOL InitFontOptionsDlg(HWND hwnd)
     //
     hwndPreview = GetDlgItem(hwnd, IDC_PREVIEW);
     oldPreviewProc = (WNDPROC)SetWindowLongPtr(hwndPreview, GWLP_WNDPROC,
-                                               (LONG)PreviewWndProc);
+                                               (LPARAM)PreviewWndProc);
 
     //	g_rgbAutoColourList[TXC_LONGLINE]	= MixRGB(GetSysColor(COLOR_3DFACE),
-    //GetSysColor(COLOR_WINDOW)); 	g_rgbAutoColourList[TXC_LINENUMBER]	=
-    //MixRGB(GetSysColor(COLOR_3DFACE), GetSysColor(COLOR_WINDOW));
+    // GetSysColor(COLOR_WINDOW)); 	g_rgbAutoColourList[TXC_LINENUMBER]	=
+    // MixRGB(GetSysColor(COLOR_3DFACE), GetSysColor(COLOR_WINDOW));
     //	g_rgbAutoColourList[TXC_LINENUMBER] =
-    //MixRGB(g_rgbAutoColourList[TXC_LINENUMBER], GetSysColor(COLOR_WINDOW));
+    // MixRGB(g_rgbAutoColourList[TXC_LINENUMBER], GetSysColor(COLOR_WINDOW));
 
     // g_rgbAutoColourList[TXC_LONGLINE]	= MixRGB(GetSysColor(COLOR_3DFACE),
     // GetSysColor(COLOR_WINDOW)); g_rgbAutoColourList[TXC_LINENUMBER]	=
@@ -715,9 +716,9 @@ BOOL InitFontOptionsDlg(HWND hwnd)
     //
     wsprintf(ach, "%d", g_nFontSize);
 
-    SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_SELECTSTRING, -1, (LONG)ach);
+    SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_SELECTSTRING, -1, (LPARAM)ach);
     SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_SELECTSTRING, -1,
-                       (LONG)g_szFontName);
+                       (LPARAM)g_szFontName);
 
     SetDlgItemInt(hwnd, IDC_PADDINGA, g_nPaddingAbove, 0);
     SetDlgItemInt(hwnd, IDC_PADDINGB, g_nPaddingBelow, 0);
@@ -742,7 +743,8 @@ BOOL InitFontOptionsDlg(HWND hwnd)
     return TRUE;
 }
 
-BOOL CALLBACK AdvancedDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK AdvancedDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
+                                 LPARAM lParam)
 {
     char lookup[] = {
         1, // DEFAULT_QUALITY
@@ -796,8 +798,8 @@ BOOL CALLBACK AdvancedDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 //
 //	Dialogbox procedure for the FONT pane
 //
-BOOL CALLBACK FontOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
-                                 LPARAM lParam)
+INT_PTR CALLBACK FontOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
+                                    LPARAM lParam)
 {
     PSHNOTIFY *pshn;
 

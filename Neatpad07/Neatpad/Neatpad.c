@@ -27,7 +27,11 @@ HFONT g_hFont;
 TCHAR szFileName[MAX_PATH];
 TCHAR szFileTitle[MAX_PATH];
 
+#ifdef _WIN64
+#pragma comment(lib, "../TextView/TextView64.lib")
+#else
 #pragma comment(lib, "../TextView/TextView.lib")
+#endif
 
 #define _MAX_PATH 260
 #define _MAX_FNAME 256
