@@ -357,6 +357,8 @@ BOOL TextView__MouseCoordToFilePos(
 
     TEXTITERATOR *itor =
         TextDocument__iterate_line_start(ptv->m_pTextDoc, nLineNo, &off_chars);
+    if (itor == NULL)
+        return 0;
 
     // character offset within the line is more complicated.
     // We have to parse the text to work out the exact character which
@@ -481,8 +483,12 @@ LONG TextView__InvalidateRange(TEXTVIEW *ptv, ULONG nStart, ULONG nFinish)
                                                     &off_chars, &len_chars);
     }
 
-    if (!TextIterator__bool(itor) || start >= finish)
+    if (itor == NULL)
         return 0;
+    if (!TextIterator__bool(itor) || start >= finish) {
+        TextIterator__delete(itor);
+        return 0;
+    }
 
     HDC hdc = GetDC(ptv->m_hWnd);
     SelectObject(hdc, ptv->m_FontAttr[0].hFont);
@@ -539,6 +545,8 @@ LONG TextView__InvalidateRange(TEXTVIEW *ptv, ULONG nStart, ULONG nFinish)
             TextIterator__delete(itor);
         itor = TextDocument__iterate_line_start_len(ptv->m_pTextDoc, ++lineno,
                                                     &off_chars, &len_chars);
+        if (itor == NULL)
+            return 0;
     }
 
     xpos2 = xpos1;
@@ -612,6 +620,8 @@ ULONG TextView__RepositionCaret(TEXTVIEW *ptv)
     TEXTITERATOR *itor = TextDocument__iterate_line_offset_start(
         ptv->m_pTextDoc, ptv->m_nCursorOffset, &lineno, &off_chars);
 
+    if (itor == NULL)
+        return 0;
     if (!TextIterator__bool(itor)) {
         TextIterator__delete(itor);
         return 0;
