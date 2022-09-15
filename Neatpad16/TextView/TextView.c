@@ -52,7 +52,7 @@ TEXTVIEW *TextView__new(HWND hwnd)
     ptv->m_nCRLFMode = TXL_CRLF; // ALL;
 
     // allocate the USPDATA cache
-    ptv->m_uspCache = malloc(sizeof(USP_CACHE) * USP_CACHE_SIZE);
+    ptv->m_uspCache = malloc(sizeof(USPCACHE) * USP_CACHE_SIZE);
     if (ptv->m_uspCache == NULL) {
         TextView__delete(ptv);
         return NULL;
@@ -87,10 +87,10 @@ TEXTVIEW *TextView__new(HWND hwnd)
     ptv->m_rgbColourList[TXC_CURRENTLINE] = RGB(230, 240, 255);
 
     // Runtime data
-    ptv->m_nSelectionMode = SELMODE_NONE;
+    ptv->m_nSelectionMode = SEL_NONE;
     ptv->m_nScrollTimer = 0;
     ptv->m_fHideCaret = FALSE;
-    ptv->m_fTransparent = TRUE;
+    // ptv->m_fTransparent		= TRUE;
     ptv->m_hImageList = 0;
 
     ptv->m_nSelectionStart = 0;
@@ -99,7 +99,10 @@ TEXTVIEW *TextView__new(HWND hwnd)
     ptv->m_nCurrentLine = 0;
 
     ptv->m_nLinenoWidth = 0;
-    SetRect(&ptv->m_rcBorder, 2, 2, 2, 2);
+    ptv->m_nCaretPosX = 0;
+    ptv->m_nAnchorPosX = 0;
+
+    // SetRect(&ptv->m_rcBorder, 2, 2, 2, 2);
 
     ptv->m_pTextDoc = TextDocument__new();
     if (ptv->m_pTextDoc == NULL) {
@@ -169,7 +172,7 @@ LONG TextView__OnKillFocus(TEXTVIEW *ptv, HWND hwndNew)
 {
     // if we are making a selection when we lost focus then
     // stop the selection logic
-    if (ptv->m_nSelectionMode != SELMODE_NONE) {
+    if (ptv->m_nSelectionMode != SEL_NONE) {
         TextView__OnLButtonUp(ptv, 0, 0, 0);
     }
 
@@ -270,6 +273,13 @@ LINEINFO *TextView__GetLineInfo(TEXTVIEW *ptv, ULONG nLineNo)
                                sizeof(LINEINFO), (COMPAREPROC)CompareLineInfo);
 }
 
+ULONG TextView__SelectionSize(TEXTVIEW *ptv)
+{
+    ULONG s1 = min(ptv->m_nSelectionStart, ptv->m_nSelectionEnd);
+    ULONG s2 = max(ptv->m_nSelectionStart, ptv->m_nSelectionEnd);
+    return s2 - s1;
+}
+
 //
 //	Public memberfunction
 //
@@ -298,6 +308,10 @@ LONG WINAPI TextView__WndProc(TEXTVIEW *ptv, UINT msg, WPARAM wParam,
         return TextView__OnMouseActivate(ptv, (HWND)wParam, LOWORD(lParam),
                                          HIWORD(lParam));
 
+    case WM_CONTEXTMENU:
+        return TextView__OnContextMenu(ptv, (HWND)wParam, (short)LOWORD(lParam),
+                                       (short)HIWORD(lParam));
+
     case WM_MOUSEWHEEL:
         return TextView__OnMouseWheel(ptv, (short)HIWORD(wParam));
 
@@ -315,15 +329,31 @@ LONG WINAPI TextView__WndProc(TEXTVIEW *ptv, UINT msg, WPARAM wParam,
         return TextView__OnLButtonUp(ptv, wParam, (short)LOWORD(lParam),
                                      (short)HIWORD(lParam));
 
+    case WM_LBUTTONDBLCLK:
+        return TextView__OnLButtonDblClick(ptv, wParam, (short)LOWORD(lParam),
+                                           (short)HIWORD(lParam));
+
     case WM_MOUSEMOVE:
         return TextView__OnMouseMove(ptv, wParam, (short)LOWORD(lParam),
                                      (short)HIWORD(lParam));
+
+    case WM_KEYDOWN:
+        return TextView__OnKeyDown(ptv, wParam, lParam);
 
     case WM_SETCURSOR:
         if (LOWORD(lParam) == HTCLIENT)
             return TRUE;
         else
             break;
+
+    case WM_COPY:
+        return TextView__OnCopy(ptv);
+
+    case WM_CUT:
+        return TextView__OnCut(ptv);
+
+    case WM_PASTE:
+        return TextView__OnPaste(ptv);
 
     case WM_TIMER:
         return TextView__OnTimer(ptv, wParam);
@@ -412,7 +442,7 @@ BOOL InitTextView(void)
 
     // Window class for the main application parent window
     wcx.cbSize = sizeof(wcx);
-    wcx.style = 0;
+    wcx.style = CS_DBLCLKS;
     wcx.lpfnWndProc = TextViewWndProc;
     wcx.cbClsExtra = 0;
     wcx.cbWndExtra = sizeof(TEXTVIEW *);
