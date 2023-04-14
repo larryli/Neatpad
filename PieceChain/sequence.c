@@ -47,16 +47,6 @@ void debug(const char *fmt, ...)
 #define odebug
 #endif
 
-void mydebug(const wchar_t * fmt, ...)
-{
-    wchar_t buf[1024];
-    va_list varg;
-    va_start(varg, fmt);
-    wvsprintfW(buf, fmt, varg);
-    va_end(varg);
-    MessageBoxW(NULL, buf, L"MyDebug", MB_OK);
-}
-
 sequence * sequence__new(void)
 {
     sequence * ps = malloc(sizeof(sequence));
