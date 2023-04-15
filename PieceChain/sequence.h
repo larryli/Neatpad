@@ -70,8 +70,8 @@ typedef struct {
     int modifybuffer_id;
     int modifybuffer_pos;
 
-        size_w lastaction_index;
-        sequence__action lastaction;
+    size_w lastaction_index;
+    sequence__action lastaction;
     bool can_quicksave;
 } sequence;
 
@@ -131,60 +131,59 @@ inline size_w sequence__event_length(sequence * ps)
 }
 
 // print out the sequence
-void sequence__debug1(sequence *);
-void sequence__debug2(sequence *);
+void sequence__debug1(sequence * ps);
+void sequence__debug2(sequence *ps);
 
 //
 // access and iteration
 //
-size_w sequence__render(sequence *, size_w index, seqchar * buf, size_w len);
-seqchar sequence__peek(sequence *, size_w index);
-bool sequence__poke(sequence *, size_w index, seqchar val);
+size_w sequence__render(sequence *ps, size_w index, seqchar * buf, size_w len);
+seqchar sequence__peek(sequence *ps, size_w index);
+bool sequence__poke(sequence *ps, size_w index, seqchar val);
 
-seqchar sequence__operator_char(sequence *, size_w index);
-sequence__ref * sequence__operator_ref(sequence *, size_w index);
+seqchar sequence__operator_char(sequence *ps, size_w index);
+sequence__ref * sequence__operator_ref(sequence *ps, size_w index);
 
 //private:
 //    typedef std::vector<span_range *> eventstack;
 //    typedef std::vector<buffer_control *> bufferlist;
-//    template <class type> void clear_vector(type &source);
-void sequence__clear_vector_sr(Vector);
-void sequence__clear_vector_bc(Vector);
+void sequence__clear_vector_sr(Vector * pv);
+void sequence__clear_vector_bc(Vector * pv);
 
 //
 //  Span-table management
 //
-void sequence__deletefromsequence(sequence *, sequence__span ** sptr);
-sequence__span * sequence__spanfromindex(sequence *, size_w index, size_w * spanindex);
-void sequence__scan(sequence *, sequence__span * sptr);
+void sequence__deletefromsequence(sequence *ps, sequence__span ** sptr);
+sequence__span * sequence__spanfromindex(sequence *ps, size_w index, size_w * spanindex);
+void sequence__scan(sequence *ps, sequence__span * sptr);
 
 //
 //  Undo and redo stacks
 //
-sequence__span_range * sequence__initundo(sequence *, size_w index, size_w length, sequence__action act);
-void sequence__restore_spanrange(sequence *, sequence__span_range * range, bool undo_or_redo);
-void sequence__swap_spanrange(sequence *, sequence__span_range * src, sequence__span_range * dest);
-bool sequence__undoredo(sequence *, Vector * source, Vector * dest);    // sequence__span_range *
-void sequence__clearstack(sequence *, Vector * source); // sequence__span_range *
-sequence__span_range * sequence__stackback(sequence *, Vector * source, size_t idx);    // sequence__span_range *
+sequence__span_range * sequence__initundo(sequence *ps, size_w index, size_w length, sequence__action act);
+void sequence__restore_spanrange(sequence *ps, sequence__span_range * range, bool undo_or_redo);
+void sequence__swap_spanrange(sequence *ps, sequence__span_range * src, sequence__span_range * dest);
+bool sequence__undoredo(sequence *ps, Vector * source, Vector * dest);    // sequence__span_range *
+void sequence__clearstack(sequence *ps, Vector * source); // sequence__span_range *
+sequence__span_range * sequence__stackback(sequence *ps, Vector * source, size_t idx);    // sequence__span_range *
 
 //
 //  File and memory buffer management
 //
-sequence__buffer_control * sequence__alloc_buffer(sequence *, size_t size);
-sequence__buffer_control * sequence__alloc_modifybuffer(sequence *, size_t size);
-bool sequence__import_buffer(sequence *, const seqchar * buf, size_t len, size_t * buffer_offset);
+sequence__buffer_control * sequence__alloc_buffer(sequence *ps, size_t size);
+sequence__buffer_control * sequence__alloc_modifybuffer(sequence *ps, size_t size);
+bool sequence__import_buffer(sequence *ps, const seqchar * buf, size_t len, size_t * buffer_offset);
 
 //
 //  Sequence manipulation
 //
-bool sequence__insert_worker(sequence *, size_w index, const seqchar * buf, size_w len, sequence__action act);
-bool sequence__erase_worker(sequence *, size_w index, size_w len, sequence__action act);
-bool sequence__can_optimize(sequence *, sequence__action act, size_w index);
-void sequence__record_action(sequence *, sequence__action act, size_w index);
+bool sequence__insert_worker(sequence *ps, size_w index, const seqchar * buf, size_w len, sequence__action act);
+bool sequence__erase_worker(sequence *ps, size_w index, size_w len, sequence__action act);
+bool sequence__can_optimize(sequence *ps, sequence__action act, size_w index);
+void sequence__record_action(sequence *ps, sequence__action act, size_w index);
 
-void sequence__LOCK(sequence *);
-void sequence__UNLOCK(sequence *);
+void sequence__LOCK(sequence *ps);
+void sequence__UNLOCK(sequence *ps);
 
 //
 //  sequence__span
@@ -244,12 +243,12 @@ struct sequence__span_range {
     bool boundary;
 
     // sequence state
-         size_w sequence_length;
-         size_w index;
-         size_w length;
-         sequence__action act;
+    size_w sequence_length;
+    size_w index;
+    size_w length;
+    sequence__action act;
     bool quicksave;
-         size_t group_id;
+    size_t group_id;
 };
 
 //public:
