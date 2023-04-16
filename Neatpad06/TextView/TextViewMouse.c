@@ -14,7 +14,7 @@
 int ScrollDir(int counter, int dir);
 
 //
-//	Wptv->m_MOUSEACTIVATE
+//	WM_MOUSEACTIVATE
 //
 //	Grab the keyboard input focus
 //
@@ -26,7 +26,7 @@ LONG TextView__OnMouseActivate(TEXTVIEW *ptv, HWND hwndTop, UINT nHitTest,
 }
 
 //
-//	Wptv->m_LBUTTONDOWN
+//	WM_LBUTTONDOWN
 //
 //  Position caret to nearest text character under mouse
 //
@@ -60,7 +60,7 @@ LONG TextView__OnLButtonDown(TEXTVIEW *ptv, UINT nFlags, int mx, int my)
 }
 
 //
-//	Wptv->m_LBUTTONUP
+//	WM_LBUTTONUP
 //
 //	Release capture and cancel any mouse-scrolling
 //
@@ -81,7 +81,7 @@ LONG TextView__OnLButtonUp(TEXTVIEW *ptv, UINT nFlags, int mx, int my)
 }
 
 //
-//	Wptv->m_MOUSEMOVE
+//	WM_MOUSEMOVE
 //
 //	Set the selection end-point if we are dragging the mouse
 //
@@ -136,7 +136,7 @@ LONG TextView__OnMouseMove(TEXTVIEW *ptv, UINT nFlags, int mx, int my)
 }
 
 //
-//	Wptv->m_TIMER handler
+//	WM_TIMER handler
 //
 //	Used to create regular scrolling
 //
@@ -184,13 +184,13 @@ LONG TextView__OnTimer(TEXTVIEW *ptv, UINT nTimerId)
     // pointing to the right places and the scroll positions are valid.
     //
     if (hrgnUpdate != NULL) {
-        // We perform a "fake" Wptv->m_MOUSEMOVE for two reasons:
+        // We perform a "fake" WM_MOUSEMOVE for two reasons:
         //
         // 1. To get the cursor/caret/selection offsets set to the correct place
         //    *before* we redraw (so everything is synchronized correctly)
         //
         // 2. To invalidate any areas due to mouse-movement which won't
-        //    get done until the next Wptv->m_MOUSEMOVE - and then it would
+        //    get done until the next WM_MOUSEMOVE - and then it would
         //    be too late because we need to redraw *now*
         //
         TextView__OnMouseMove(ptv, 0, pt.x, pt.y);
@@ -199,12 +199,12 @@ LONG TextView__OnTimer(TEXTVIEW *ptv, UINT nTimerId)
         InvalidateRgn(ptv->m_hWnd, hrgnUpdate, FALSE);
         DeleteObject(hrgnUpdate);
 
-        // the next time we process Wptv->m_PAINT everything
+        // the next time we process WM_PAINT everything
         // should get drawn correctly!!
         UpdateWindow(ptv->m_hWnd);
     }
 
-    // keep track of how many Wptv->m_TIMERs we process because
+    // keep track of how many WM_TIMERs we process because
     // we might want to skip the next one
     ptv->m_nScrollCounter++;
 

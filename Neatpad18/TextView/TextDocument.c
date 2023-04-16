@@ -395,7 +395,7 @@ bool TextDocument__init_linebuffer(TEXTDOCUMENT *ptd)
     ULONG offset_chars = 0;
     ULONG linestart_bytes = 0;
     ULONG linestart_chars = 0;
-    ULONG bytes_left = ptd->m_nDocLength_bytes - ptd->m_nHeaderSize;
+    // ULONG bytes_left = ptd->m_nDocLength_bytes - ptd->m_nHeaderSize;
 
     ULONG buflen = ptd->m_nDocLength_bytes - ptd->m_nHeaderSize;
 
@@ -485,36 +485,28 @@ ULONG TextDocument__linecount(TEXTDOCUMENT *ptd) { return ptd->m_nNumLines; }
 ULONG TextDocument__longestline(TEXTDOCUMENT *ptd, int tabwidth)
 {
     // ULONG i;
-    ULONG longest = 0;
-    ULONG xpos = 0;
+    // ULONG longest = 0;
+    // ULONG xpos = 0;
     //  char *bufptr = (char *)(ptd->buffer + ptd->m_nHeaderSize);
     /*
-       for(i = 0; i < ptd->length_bytes; i++)
-       {
-       if(bufptr[i] == '\r')
-       {
-       if(bufptr[i+1] == '\n')
-       i++;
+        for(i = 0; i < ptd->length_bytes; i++) {
+            if(bufptr[i] == '\r') {
+                if(bufptr[i+1] == '\n')
+                    i++;
 
-       longest = max(longest, xpos);
-       xpos = 0;
-       }
-       else if(bufptr[i] == '\n')
-       {
-       longest = max(longest, xpos);
-       xpos = 0;
-       }
-       else if(bufptr[i] == '\t')
-       {
-       xpos += tabwidth - (xpos % tabwidth);
-       }
-       else
-       {
-       xpos ++;
-       }
-       }
+                longest = max(longest, xpos);
+                xpos = 0;
+            } else if(bufptr[i] == '\n') {
+                longest = max(longest, xpos);
+                xpos = 0;
+            } else if(bufptr[i] == '\t') {
+                xpos += tabwidth - (xpos % tabwidth);
+            } else {
+                xpos ++;
+            }
+        }
 
-       longest = max(longest, xpos); */
+        longest = max(longest, xpos); */
     return 100; // longest;
 }
 

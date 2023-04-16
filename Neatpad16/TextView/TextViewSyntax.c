@@ -34,12 +34,12 @@ LEX firstchar[256];
 
 ULONG lexer(ULONG cookie, TCHAR *buf, ULONG len, ATTR *attr)
 {
-    LEX *state = 0;
+    // LEX *state = 0;
     int i = 0;
     ULONG ch = buf[i++];
 
     // start at the correct place in our state machine
-    LEX *node = &state[cookie];
+    // LEX *node = &state[cookie];
 
     // look for a match against the current character
     //	for(i = 0; i < node->num_branches; i++)

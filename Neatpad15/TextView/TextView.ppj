@@ -95,7 +95,8 @@ output\TextViewFont.obj: \
 	codepages.h \
 	TextDocument.h \
 	TextView.h \
-	TextViewInternal.h
+	TextViewInternal.h \
+	..\UspLib\usplib.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 # 
@@ -130,7 +131,8 @@ output\TextViewScroll.obj: \
 	codepages.h \
 	TextDocument.h \
 	TextView.h \
-	TextViewInternal.h
+	TextViewInternal.h \
+	..\UspLib\usplib.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 # 

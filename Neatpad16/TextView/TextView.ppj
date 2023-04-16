@@ -44,16 +44,16 @@ POC_PROJECT_ZIPEXTRA = #
 TextView.lib: \
 	output\TextDocument.obj \
 	output\TextView.obj \
+	output\TextViewClipboard.obj \
 	output\TextViewFile.obj \
 	output\TextViewFont.obj \
+	output\TextViewKeyNav.obj \
 	output\TextViewMouse.obj \
 	output\TextViewPaint.obj \
-	output\TextViewScroll.obj \
-	output\Unicode.obj \
-	output\TextViewClipboard.obj \
-	output\TextViewKeyNav.obj \
 	output\TextViewParser.obj \
+	output\TextViewScroll.obj \
 	output\TextViewSyntax.obj \
+	output\Unicode.obj \
 	output\Uniscribe.obj
 	$(AR) $(ARFLAGS) -out:"$@" $**
 
@@ -100,7 +100,8 @@ output\TextViewFont.obj: \
 	codepages.h \
 	TextDocument.h \
 	TextView.h \
-	TextViewInternal.h
+	TextViewInternal.h \
+	..\UspLib\usplib.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 # 
@@ -135,7 +136,8 @@ output\TextViewScroll.obj: \
 	codepages.h \
 	TextDocument.h \
 	TextView.h \
-	TextViewInternal.h
+	TextViewInternal.h \
+	..\UspLib\usplib.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 # 

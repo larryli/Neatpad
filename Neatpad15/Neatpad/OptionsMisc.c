@@ -6,16 +6,17 @@
 //
 #include <windows.h>
 
-#include "Neatpad.h"
-#include "resource.h"
 #include <commctrl.h>
 #include <shellapi.h>
+
+#include "Neatpad.h"
+#include "resource.h"
 
 //
 //	Dialogbox procedure for the FONT pane
 //
 INT_PTR CALLBACK MiscOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam,
-                                 LPARAM lParam)
+                                    LPARAM lParam)
 {
     PSHNOTIFY *pshn;
 

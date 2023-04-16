@@ -243,7 +243,7 @@ void TextView__PaintLine(TEXTVIEW *ptv, HDC hdc, ULONG nLineNo, int xpos,
                          int ypos, HRGN hrgnUpdate)
 {
     RECT bounds;
-    HRGN hrgnBounds;
+    HRGN hrgnBounds = NULL;
 
     GetClientRect(ptv->m_hWnd, &bounds);
     SelectClipRgn(hdc, NULL);
@@ -352,8 +352,8 @@ int TextView__PaintMargin(TEXTVIEW *ptv, HDC hdc, ULONG nLineNo, int xpos,
 
     int imgWidth;
     int imgHeight;
-    int imgX;
-    int imgY;
+    int imgX = 0;
+    int imgY = 0;
     int selwidth = TextView__CheckStyle(ptv, TXS_SELMARGIN) ? 20 : 0;
 
     TCHAR ach[32];

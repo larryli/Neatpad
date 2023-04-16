@@ -137,7 +137,8 @@ typedef struct {
 TEXTVIEW *TextView__new(HWND hwnd);
 void TextView__delete(TEXTVIEW *ptv);
 
-LONG WINAPI TextView__WndProc(TEXTVIEW *ptv, UINT msg, WPARAM wParam, LPARAM lParam);
+LONG WINAPI TextView__WndProc(TEXTVIEW *ptv, UINT msg, WPARAM wParam,
+                              LPARAM lParam);
 
 // private
 //
@@ -151,7 +152,8 @@ LONG TextView__OnHScroll(TEXTVIEW *ptv, UINT nSBCode, UINT nPos);
 LONG TextView__OnMouseWheel(TEXTVIEW *ptv, int nDelta);
 LONG TextView__OnTimer(TEXTVIEW *ptv, UINT nTimer);
 
-LONG TextView__OnMouseActivate(TEXTVIEW *ptv, HWND hwndTop, UINT nHitTest, UINT nMessage);
+LONG TextView__OnMouseActivate(TEXTVIEW *ptv, HWND hwndTop, UINT nHitTest,
+                               UINT nMessage);
 LONG TextView__OnLButtonDown(TEXTVIEW *ptv, UINT nFlags, int x, int y);
 LONG TextView__OnLButtonUp(TEXTVIEW *ptv, UINT nFlags, int x, int y);
 LONG TextView__OnMouseMove(TEXTVIEW *ptv, UINT nFlags, int x, int y);
@@ -176,17 +178,21 @@ COLORREF TextView__SetColour(TEXTVIEW *ptv, UINT idx, COLORREF rgbColour);
 //
 //	Private Helper functions
 //
-void TextView__PaintLine(TEXTVIEW *ptv, HDC hdc, ULONG line, int x, int y, HRGN hrgnUpdate);
-void TextView__PaintText(TEXTVIEW *ptv, HDC hdc, ULONG nLineNo, int x, int y, RECT *bounds);
+void TextView__PaintLine(TEXTVIEW *ptv, HDC hdc, ULONG line, int x, int y,
+                         HRGN hrgnUpdate);
+void TextView__PaintText(TEXTVIEW *ptv, HDC hdc, ULONG nLineNo, int x, int y,
+                         RECT *bounds);
 int TextView__PaintMargin(TEXTVIEW *ptv, HDC hdc, ULONG line, int x, int y);
 
-int TextView__ApplyTextAttributes(TEXTVIEW *ptv, ULONG nLineNo, ULONG offset, ULONG *nColumn,
-                        TCHAR *szText, int nTextLen, ATTR *attr);
+int TextView__ApplyTextAttributes(TEXTVIEW *ptv, ULONG nLineNo, ULONG offset,
+                                  ULONG *nColumn, TCHAR *szText, int nTextLen,
+                                  ATTR *attr);
 void TextView__RefreshWindow(TEXTVIEW *ptv);
 LONG TextView__InvalidateRange(TEXTVIEW *ptv, ULONG nStart, ULONG nFinish);
 LONG TextView__InvalidateLine(TEXTVIEW *ptv, ULONG nLineNo, BOOL forceAnalysis);
 VOID TextView__UpdateLine(TEXTVIEW *ptv, ULONG nLineNo);
-int TextView__SyntaxColour(TEXTVIEW *ptv, TCHAR *szText, ULONG nTextLen, ATTR *attr);
+int TextView__SyntaxColour(TEXTVIEW *ptv, TCHAR *szText, ULONG nTextLen,
+                           ATTR *attr);
 
 int TextView__NeatTextYOffset(TEXTVIEW *ptv, USPFONT *font);
 int TextView__TextWidth(TEXTVIEW *ptv, HDC hdc, TCHAR *buf, int len);
@@ -196,8 +202,9 @@ void TextView__UpdateMarginWidth(TEXTVIEW *ptv);
 int TextView__SetCaretWidth(TEXTVIEW *ptv, int nWidth);
 BOOL TextView__SetImageList(TEXTVIEW *ptv, HIMAGELIST hImgList);
 
-BOOL TextView__MouseCoordToFilePos(TEXTVIEW *ptv, int x, int y, ULONG *pnLineNo, ULONG *pnFileOffset,
-                         int *px); //, ULONG *pnLineLen=0);
+BOOL TextView__MouseCoordToFilePos(TEXTVIEW *ptv, int x, int y, ULONG *pnLineNo,
+                                   ULONG *pnFileOffset,
+                                   int *px); //, ULONG *pnLineLen=0);
 ULONG TextView__RepositionCaret(TEXTVIEW *ptv);
 VOID TextView__MoveCaret(TEXTVIEW *ptv, int x, int y);
 
@@ -215,7 +222,8 @@ COLORREF TextView__LongColour(TEXTVIEW *ptv, ULONG nLineNo);
 
 int TextView__SetLineImage(TEXTVIEW *ptv, ULONG nLineNo, ULONG nImageIdx);
 LINEINFO *TextView__GetLineInfo(TEXTVIEW *ptv, ULONG nLineNo);
-int TextView__StripCRLF(TEXTVIEW *ptv, TCHAR *szText, ATTR *attrList, int nLength, BOOL fAllow);
+int TextView__StripCRLF(TEXTVIEW *ptv, TCHAR *szText, ATTR *attrList,
+                        int nLength, BOOL fAllow);
 
 VOID TextView__SetupScrollbars(TEXTVIEW *ptv);
 VOID TextView__UpdateMetrics(TEXTVIEW *ptv);
@@ -228,6 +236,7 @@ HRGN TextView__ScrollRgn(TEXTVIEW *ptv, int dx, int dy, BOOL fReturnUpdateRgn);
 void TextView__ResetLineCache(TEXTVIEW *ptv);
 
 USPDATA *TextView__GetUspData(TEXTVIEW *ptv, HDC hdc, ULONG nLineNo);
-USPDATA *TextView__GetUspData_offset(TEXTVIEW *ptv, HDC hdc, ULONG nLineNo, ULONG *off_chars);
+USPDATA *TextView__GetUspData_offset(TEXTVIEW *ptv, HDC hdc, ULONG nLineNo,
+                                     ULONG *off_chars);
 
 #endif

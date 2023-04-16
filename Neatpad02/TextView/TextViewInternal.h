@@ -28,7 +28,7 @@ LONG TextView__ClearFile(TEXTVIEW *ptv);
 // private
 void TextView__PaintLine(TEXTVIEW *ptv, HDC hdc, ULONG line);
 void TextView__TabbedExtTextOut(TEXTVIEW *ptv, HDC hdc, RECT *rect, TCHAR *buf,
-                                 int len);
+                                int len);
 COLORREF TextView__GetTextViewColor(TEXTVIEW *ptv, UINT idx);
 
 #endif

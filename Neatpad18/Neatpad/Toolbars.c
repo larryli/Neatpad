@@ -41,7 +41,7 @@ int StatusBarMenuSelect(HWND hwnd, HWND hwndSB, WPARAM wParam, LPARAM lParam)
 
 //
 //	Create each menubar pane. Must be called whenever the statusbar changes
-//size,
+// size,
 //  so call each time the main-window gets a WM_SIZE
 //
 void SetStatusBarParts(HWND hwndSB)

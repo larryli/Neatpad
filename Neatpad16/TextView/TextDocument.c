@@ -313,7 +313,7 @@ BOOL TextDocument__init_linebuffer(TEXTDOCUMENT *ptd)
     ULONG offset_chars = 0;
     ULONG linestart_bytes = 0;
     ULONG linestart_chars = 0;
-    ULONG bytes_left = ptd->length_bytes - ptd->headersize;
+    // ULONG bytes_left = ptd->length_bytes - ptd->headersize;
 
     ULONG buflen = ptd->length_bytes - ptd->headersize;
 

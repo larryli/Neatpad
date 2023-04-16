@@ -8,9 +8,10 @@
 
    Freeware
  */
-#include <windows.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <windows.h>
+
 #include "sequence.h"
 
 #ifdef DEBUG_SEQUENCE
@@ -30,7 +31,7 @@ void odebug(const char *fmt, ...)
 
 void debug(const char *fmt, ...)
 {
-    FILE * fp;
+    FILE *fp;
     va_list varg;
     va_start(varg, fmt);
 
@@ -47,9 +48,9 @@ void debug(const char *fmt, ...)
 #define odebug
 #endif
 
-sequence * sequence__new(void)
+sequence *sequence__new(void)
 {
-    sequence * ps = malloc(sizeof(sequence));
+    sequence *ps = malloc(sizeof(sequence));
     if (ps == NULL)
         return NULL;
 
@@ -73,13 +74,13 @@ sequence * sequence__new(void)
     SYSTEMTIME st;
     GetLocalTime(&st);
     sprintf(debugfile, "seqlog-%04d%02d%02d-%02d%02d%0d.txt", st.wYear,
-        st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+            st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
 #endif
 
     return ps;
 }
 
-void sequence__delete(sequence * ps)
+void sequence__delete(sequence *ps)
 {
     sequence__clear(ps);
 
@@ -92,7 +93,7 @@ void sequence__delete(sequence * ps)
     free(ps);
 }
 
-bool sequence__init(sequence * ps)
+bool sequence__init(sequence *ps)
 {
     ps->sequence_length = 0;
 
@@ -108,18 +109,19 @@ bool sequence__init(sequence * ps)
     return true;
 }
 
-bool sequence__init_buffer(sequence * ps, const seqchar * buffer, size_t length)
+bool sequence__init_buffer(sequence *ps, const seqchar *buffer, size_t length)
 {
     sequence__clear(ps);
 
     if (!sequence__init(ps))
         return false;
 
-    sequence__buffer_control * bc = sequence__alloc_modifybuffer(ps, length);
+    sequence__buffer_control *bc = sequence__alloc_modifybuffer(ps, length);
     memcpy(bc->buffer, buffer, length * sizeof(seqchar));
     bc->length = length;
 
-    sequence__span * sptr = sequence__span__new_nx_pr(0, length, bc->id, ps->tail, ps->head);
+    sequence__span *sptr =
+        sequence__span__new_nx_pr(0, length, bc->id, ps->tail, ps->head);
     ps->head->next = sptr;
     ps->tail->prev = sptr;
 
@@ -130,43 +132,51 @@ bool sequence__init_buffer(sequence * ps, const seqchar * buffer, size_t length)
 //
 //  Initialize from an on-disk file
 //
-bool sequence__open(sequence * ps, TCHAR * filename, bool readonly)
+bool sequence__open(sequence *ps, TCHAR *filename, bool readonly)
 {
     return false;
 }
 
 void sequence__clear_vector_sr(Vector *vector)
 {
-    VECTOR_FOR_EACH(vector, i) {
-        sequence__span_range * pssr = ITERATOR_GET_AS(sequence__span_range *, &i);
+    VECTOR_FOR_EACH(vector, i)
+    {
+        sequence__span_range *pssr =
+            ITERATOR_GET_AS(sequence__span_range *, &i);
         sequence__span_range__delete(pssr);
     }
 }
 
 void sequence__clear_vector_bc(Vector *vector)
 {
-    VECTOR_FOR_EACH(vector, i) {
-        sequence__buffer_control *psbc = ITERATOR_GET_AS(sequence__buffer_control *, &i);
-        free(psbc);;
+    VECTOR_FOR_EACH(vector, i)
+    {
+        sequence__buffer_control *psbc =
+            ITERATOR_GET_AS(sequence__buffer_control *, &i);
+        free(psbc);
+        ;
     }
 }
 
-void sequence__clearstack(sequence * ps, Vector * dest)
+void sequence__clearstack(sequence *ps, Vector *dest)
 {
-    VECTOR_FOR_EACH(dest, i) {
-        sequence__span_range * pssr = ITERATOR_GET_AS(sequence__span_range *, &i);
+    VECTOR_FOR_EACH(dest, i)
+    {
+        sequence__span_range *pssr =
+            ITERATOR_GET_AS(sequence__span_range *, &i);
         sequence__span_range__free(pssr);
         sequence__span_range__delete(pssr);
     }
     vector_clear(dest);
 }
 
-void sequence__debug1(sequence * ps)
+void sequence__debug1(sequence *ps)
 {
-    sequence__span * sptr;
+    sequence__span *sptr;
 
     for (sptr = ps->head; sptr; sptr = sptr->next) {
-        sequence__buffer_control * psbc = VECTOR_GET_AS(sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
+        sequence__buffer_control *psbc = VECTOR_GET_AS(
+            sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
         char *buffer = (char *)psbc->buffer;
         printf("%.*s", sptr->length, buffer + sptr->offset);
     }
@@ -174,31 +184,36 @@ void sequence__debug1(sequence * ps)
     printf("\n");
 }
 
-void sequence__debug2(sequence * ps)
+void sequence__debug2(sequence *ps)
 {
-    sequence__span * sptr;
+    sequence__span *sptr;
 
     printf("**********************\n");
     for (sptr = ps->head; sptr; sptr = sptr->next) {
-        sequence__buffer_control * psbc = VECTOR_GET_AS(sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
+        sequence__buffer_control *psbc = VECTOR_GET_AS(
+            sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
         char *buffer = (char *)psbc->buffer;
 
-        printf("[%d] [%4d %4d] %.*s\n", sptr->id, sptr->offset, sptr->length, sptr->length, buffer + sptr->offset);
+        printf("[%d] [%4d %4d] %.*s\n", sptr->id, sptr->offset, sptr->length,
+               sptr->length, buffer + sptr->offset);
     }
 
     printf("-------------------------\n");
 
     for (sptr = ps->tail; sptr; sptr = sptr->prev) {
-        sequence__buffer_control * psbc = VECTOR_GET_AS(sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
+        sequence__buffer_control *psbc = VECTOR_GET_AS(
+            sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
         char *buffer = (char *)psbc->buffer;
 
-        printf("[%d] [%4d %4d] %.*s\n", sptr->id, sptr->offset, sptr->length, sptr->length, buffer + sptr->offset);
+        printf("[%d] [%4d %4d] %.*s\n", sptr->id, sptr->offset, sptr->length,
+               sptr->length, buffer + sptr->offset);
     }
 
     printf("**********************\n");
 
     for (sptr = ps->head; sptr; sptr = sptr->next) {
-        sequence__buffer_control * psbc = VECTOR_GET_AS(sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
+        sequence__buffer_control *psbc = VECTOR_GET_AS(
+            sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
         char *buffer = (char *)psbc->buffer;
         printf("%.*s", sptr->length, buffer + sptr->offset);
     }
@@ -210,9 +225,9 @@ void sequence__debug2(sequence * ps)
 //
 //  Allocate a buffer and add it to our 'buffer control' list
 //
-sequence__buffer_control * sequence__alloc_buffer(sequence * ps, size_t maxsize)
+sequence__buffer_control *sequence__alloc_buffer(sequence *ps, size_t maxsize)
 {
-    sequence__buffer_control * bc;
+    sequence__buffer_control *bc;
 
     if ((bc = malloc(sizeof(sequence__buffer_control))) == 0)
         return 0;
@@ -225,16 +240,17 @@ sequence__buffer_control * sequence__alloc_buffer(sequence * ps, size_t maxsize)
 
     bc->length = 0;
     bc->maxsize = maxsize;
-    bc->id = ps->buffer_list.size;  // assign the id
+    bc->id = ps->buffer_list.size; // assign the id
 
     vector_push_back(&(ps->buffer_list), &bc);
 
     return bc;
 }
 
-sequence__buffer_control * sequence__alloc_modifybuffer(sequence * ps, size_t maxsize)
+sequence__buffer_control *sequence__alloc_modifybuffer(sequence *ps,
+                                                       size_t maxsize)
 {
-    sequence__buffer_control * bc;
+    sequence__buffer_control *bc;
 
     if ((bc = sequence__alloc_buffer(ps, maxsize)) == 0)
         return 0;
@@ -247,14 +263,16 @@ sequence__buffer_control * sequence__alloc_modifybuffer(sequence * ps, size_t ma
 
 //
 //  Import the specified range of data into the sequence so we have our own
-//private copy
+// private copy
 //
-bool sequence__import_buffer(sequence * ps, const seqchar * buf, size_t len, size_t * buffer_offset)
+bool sequence__import_buffer(sequence *ps, const seqchar *buf, size_t len,
+                             size_t *buffer_offset)
 {
-    sequence__buffer_control * bc;
+    sequence__buffer_control *bc;
 
     // get the current modify-buffer
-    bc = VECTOR_GET_AS(sequence__buffer_control *, &(ps->buffer_list), ps->modifybuffer_id);
+    bc = VECTOR_GET_AS(sequence__buffer_control *, &(ps->buffer_list),
+                       ps->modifybuffer_id);
 
     // if there isn't room then allocate a new modify-buffer
     if (bc->length + len >= bc->maxsize) {
@@ -280,14 +298,15 @@ bool sequence__import_buffer(sequence * ps, const seqchar * buf, size_t len, siz
 //  sequence__spanfromindex
 //
 //  search the spanlist for the span which encompasses the specified index
-//position
+// position
 //
 //  index       - character-position index
 //  *spanindex  - index of span within sequence
 //
-sequence__span * sequence__spanfromindex(sequence * ps, size_w index, size_w * spanindex)
+sequence__span *sequence__spanfromindex(sequence *ps, size_w index,
+                                        size_w *spanindex)
 {
-    sequence__span * sptr;
+    sequence__span *sptr;
     size_w curidx = 0;
 
     // scan the list looking for the span which holds the specified index
@@ -311,7 +330,8 @@ sequence__span * sequence__spanfromindex(sequence * ps, size_w index, size_w * s
     return 0;
 }
 
-void sequence__swap_spanrange(sequence * ps, sequence__span_range * src, sequence__span_range * dest)
+void sequence__swap_spanrange(sequence *ps, sequence__span_range *src,
+                              sequence__span_range *dest)
 {
     if (src->boundary) {
         if (!dest->boundary) {
@@ -333,11 +353,12 @@ void sequence__swap_spanrange(sequence * ps, sequence__span_range * src, sequenc
     }
 }
 
-void sequence__restore_spanrange(sequence * ps, sequence__span_range * range, bool undo_or_redo)
+void sequence__restore_spanrange(sequence *ps, sequence__span_range *range,
+                                 bool undo_or_redo)
 {
     if (range->boundary) {
-        sequence__span * first = range->first->next;
-        sequence__span * last = range->last->prev;
+        sequence__span *first = range->first->next;
+        sequence__span *last = range->last->prev;
 
         // unlink spans from main list
         range->first->next = range->last;
@@ -348,8 +369,8 @@ void sequence__restore_spanrange(sequence * ps, sequence__span_range * range, bo
         range->last = last;
         range->boundary = false;
     } else {
-        sequence__span * first = range->first->prev;
-        sequence__span * last = range->last->next;
+        sequence__span *first = range->first->prev;
+        sequence__span *last = range->last->next;
 
         // are we moving spans into an "empty" region?
         // (i.e. inbetween two adjacent spans)
@@ -382,12 +403,12 @@ void sequence__restore_spanrange(sequence * ps, sequence__span_range * range, bo
     }
 
     // update the 'sequence length' and 'quicksave' states
-    //std__swap(range->sequence_length, sequence_length);
+    // std__swap(range->sequence_length, sequence_length);
     size_w temp;
     temp = range->sequence_length;
     range->sequence_length = ps->sequence_length;
     ps->sequence_length = temp;
-    //std__swap(range->quicksave, can_quicksave);
+    // std__swap(range->quicksave, can_quicksave);
     bool tempb;
     tempb = range->quicksave;
     range->quicksave = ps->can_quicksave;
@@ -395,7 +416,8 @@ void sequence__restore_spanrange(sequence * ps, sequence__span_range * range, bo
 
     ps->undoredo_index = range->index;
 
-    if (range->act == action_erase && undo_or_redo == true || range->act != action_erase && undo_or_redo == false) {
+    if (range->act == action_erase && undo_or_redo == true ||
+        range->act != action_erase && undo_or_redo == false) {
         ps->undoredo_length = range->length;
     } else {
         ps->undoredo_length = 0;
@@ -408,9 +430,9 @@ void sequence__restore_spanrange(sequence * ps, sequence__span_range * range, bo
 //  private routine used to undo/redo spanrange events to/from
 //  the sequence - handles 'grouped' events
 //
-bool sequence__undoredo(sequence * ps, Vector * source, Vector * dest)
+bool sequence__undoredo(sequence *ps, Vector *source, Vector *dest)
 {
-    sequence__span_range * range = 0;
+    sequence__span_range *range = 0;
     size_t group_id;
 
     if (vector_is_empty(source))
@@ -430,9 +452,12 @@ bool sequence__undoredo(sequence * ps, Vector * source, Vector * dest)
         vector_push_back(dest, &range);
 
         // do the actual work
-        sequence__restore_spanrange(ps, range, source == &(ps->undostack) ? true : false);
+        sequence__restore_spanrange(ps, range,
+                                    source == &(ps->undostack) ? true : false);
     } while (!vector_is_empty(source) &&
-        ((*(sequence__span_range **)vector_back(source))->group_id == group_id && group_id != 0));
+             ((*(sequence__span_range **)vector_back(source))->group_id ==
+                  group_id &&
+              group_id != 0));
 
     return true;
 }
@@ -440,7 +465,7 @@ bool sequence__undoredo(sequence * ps, Vector * source, Vector * dest)
 //
 //  UNDO the last action
 //
-bool sequence__undo(sequence * ps)
+bool sequence__undo(sequence *ps)
 {
     debug("Undo\n");
     return sequence__undoredo(ps, &(ps->undostack), &(ps->redostack));
@@ -449,7 +474,7 @@ bool sequence__undo(sequence * ps)
 //
 //  REDO the last UNDO
 //
-bool sequence__redo(sequence * ps)
+bool sequence__redo(sequence *ps)
 {
     debug("Redo\n");
     return sequence__undoredo(ps, &(ps->redostack), &(ps->undostack));
@@ -458,24 +483,18 @@ bool sequence__redo(sequence * ps)
 //
 //  Will calling sequence__undo change the sequence?
 //
-bool sequence__canundo(sequence * ps)
-{
-    return ps->undostack.size != 0;
-}
+bool sequence__canundo(sequence *ps) { return ps->undostack.size != 0; }
 
 //
 //  Will calling sequence__redo change the sequence?
 //
-bool sequence__canredo(sequence * ps)
-{
-    return ps->redostack.size != 0;
-}
+bool sequence__canredo(sequence *ps) { return ps->redostack.size != 0; }
 
 //
 //  Group repeated actions on the sequence (insert/erase etc)
 //  into a single 'undoable' action
 //
-void sequence__group(sequence * ps)
+void sequence__group(sequence *ps)
 {
     if (ps->group_refcount == 0) {
         if (++ps->group_id == 0)
@@ -488,7 +507,7 @@ void sequence__group(sequence * ps)
 //
 //  Close the grouping
 //
-void sequence__ungroup(sequence * ps)
+void sequence__ungroup(sequence *ps)
 {
     if (ps->group_refcount > 0)
         ps->group_refcount--;
@@ -497,20 +516,18 @@ void sequence__ungroup(sequence * ps)
 //
 //  Return logical length of the sequence
 //
-size_w sequence__size(sequence * ps)
-{
-    return ps->sequence_length;
-}
+size_w sequence__size(sequence *ps) { return ps->sequence_length; }
 
 //
 //  sequence__initundo
 //
 //  create a new (empty) span range and save the current sequence state
 //
-sequence__span_range * sequence__initundo(sequence * ps, size_w index, size_w length, sequence__action act)
+sequence__span_range *sequence__initundo(sequence *ps, size_w index,
+                                         size_w length, sequence__action act)
 {
-    sequence__span_range * event =
-        sequence__span_range__new_(ps->sequence_length, index, length, act, ps->can_quicksave,
+    sequence__span_range *event = sequence__span_range__new_(
+        ps->sequence_length, index, length, act, ps->can_quicksave,
         ps->group_refcount ? ps->group_id : 0);
 
     vector_push_back(&(ps->undostack), &event);
@@ -518,7 +535,8 @@ sequence__span_range * sequence__initundo(sequence * ps, size_w index, size_w le
     return event;
 }
 
-sequence__span_range * sequence__stackback(sequence * ps, Vector * source, size_t idx)
+sequence__span_range *sequence__stackback(sequence *ps, Vector *source,
+                                          size_t idx)
 {
     size_t length = source->size;
 
@@ -529,26 +547,27 @@ sequence__span_range * sequence__stackback(sequence * ps, Vector * source, size_
     }
 }
 
-void sequence__record_action(sequence * ps, sequence__action act, size_w index)
+void sequence__record_action(sequence *ps, sequence__action act, size_w index)
 {
     ps->lastaction_index = index;
     ps->lastaction = act;
 }
 
-bool sequence__can_optimize(sequence * ps, sequence__action act, size_w index)
+bool sequence__can_optimize(sequence *ps, sequence__action act, size_w index)
 {
-    return(ps->lastaction == act && ps->lastaction_index == index);
+    return (ps->lastaction == act && ps->lastaction_index == index);
 }
 
 //
 //  sequence__insert_worker
 //
-bool sequence__insert_worker(sequence * ps, size_w index, const seqchar * buf, size_w length, sequence__action act)
+bool sequence__insert_worker(sequence *ps, size_w index, const seqchar *buf,
+                             size_w length, sequence__action act)
 {
-    sequence__span * sptr;
+    sequence__span *sptr;
     size_w spanindex;
     size_t modbuf_offset;
-    sequence__span_range * newspans = sequence__span_range__new();
+    sequence__span_range *newspans = sequence__span_range__new();
     size_w insoffset;
 
     if (index > ps->sequence_length) {
@@ -577,7 +596,8 @@ bool sequence__insert_worker(sequence * ps, size_w index, const seqchar * buf, s
     // span-boundary
     if (insoffset == 0 && sequence__can_optimize(ps, act, index)) {
         // simply extend the last span's length
-        sequence__span_range * event = *(sequence__span_range **)vector_back(&(ps->undostack));
+        sequence__span_range *event =
+            *(sequence__span_range **)vector_back(&(ps->undostack));
         sptr->prev->length += length;
         event->length += length;
     }
@@ -587,11 +607,14 @@ bool sequence__insert_worker(sequence * ps, size_w index, const seqchar * buf, s
         // Create a new undo event; because we are inserting at a span
         // boundary there are no spans to replace, so use a "span boundary"
         //
-        sequence__span_range * oldspans = sequence__initundo(ps, index, length, act);
+        sequence__span_range *oldspans =
+            sequence__initundo(ps, index, length, act);
         sequence__span_range__spanboundary(oldspans, sptr->prev, sptr);
 
         // allocate new span in the modify buffer
-        sequence__span_range__append(newspans, sequence__span__new(modbuf_offset, length, ps->modifybuffer_id));
+        sequence__span_range__append(
+            newspans,
+            sequence__span__new(modbuf_offset, length, ps->modifybuffer_id));
 
         // link the span into the sequence
         sequence__swap_spanrange(ps, oldspans, newspans);
@@ -602,18 +625,25 @@ bool sequence__insert_worker(sequence * ps, size_w index, const seqchar * buf, s
         //  Create a new undo event and add the span
         //  that we will be "splitting" in half
         //
-        sequence__span_range * oldspans = sequence__initundo(ps, index, length, act);
+        sequence__span_range *oldspans =
+            sequence__initundo(ps, index, length, act);
         sequence__span_range__append(oldspans, sptr);
 
         //  span for the existing data before the insertion
-        sequence__span_range__append(newspans, sequence__span__new(sptr->offset, insoffset, sptr->buffer));
+        sequence__span_range__append(
+            newspans,
+            sequence__span__new(sptr->offset, insoffset, sptr->buffer));
 
         // make a span for the inserted data
-        sequence__span_range__append(newspans, sequence__span__new(modbuf_offset, length, ps->modifybuffer_id));
+        sequence__span_range__append(
+            newspans,
+            sequence__span__new(modbuf_offset, length, ps->modifybuffer_id));
 
         // span for the existing data after the insertion
-        sequence__span_range__append(newspans, sequence__span__new(sptr->offset + insoffset,
-                sptr->length - insoffset, sptr->buffer));
+        sequence__span_range__append(
+            newspans,
+            sequence__span__new(sptr->offset + insoffset,
+                                sptr->length - insoffset, sptr->buffer));
 
         sequence__swap_spanrange(ps, oldspans, newspans);
     }
@@ -630,7 +660,8 @@ bool sequence__insert_worker(sequence * ps, size_w index, const seqchar * buf, s
 //  Insert a buffer into the sequence at the specified position.
 //  Consecutive insertions are optimized into a single event
 //
-bool sequence__insert_buf(sequence * ps, size_w index, const seqchar * buf, size_w length)
+bool sequence__insert_buf(sequence *ps, size_w index, const seqchar *buf,
+                          size_w length)
 {
     if (sequence__insert_worker(ps, index, buf, length, action_insert)) {
         sequence__record_action(ps, action_insert, index + length);
@@ -645,7 +676,7 @@ bool sequence__insert_buf(sequence * ps, size_w index, const seqchar * buf, size
 //
 //  Insert specified character-value into sequence
 //
-bool sequence__insert(sequence * ps, size_w index, const seqchar val)
+bool sequence__insert(sequence *ps, size_w index, const seqchar val)
 {
     return sequence__insert_buf(ps, index, &val, 1);
 }
@@ -655,9 +686,9 @@ bool sequence__insert(sequence * ps, size_w index, const seqchar val)
 //
 //  Remove + delete the specified *span* from the sequence
 //
-void sequence__deletefromsequence(sequence * ps, sequence__span ** psptr)
+void sequence__deletefromsequence(sequence *ps, sequence__span **psptr)
 {
-    sequence__span * sptr = *psptr;
+    sequence__span *sptr = *psptr;
     sptr->prev->next = sptr->next;
     sptr->next->prev = sptr->prev;
 
@@ -669,12 +700,13 @@ void sequence__deletefromsequence(sequence * ps, sequence__span ** psptr)
 //
 //  sequence__erase_worker
 //
-bool sequence__erase_worker(sequence * ps, size_w index, size_w length, sequence__action act)
+bool sequence__erase_worker(sequence *ps, size_w index, size_w length,
+                            sequence__action act)
 {
-    sequence__span * sptr;
-    sequence__span_range * oldspans = sequence__span_range__new();
-    sequence__span_range * newspans = sequence__span_range__new();
-    sequence__span_range * event;
+    sequence__span *sptr;
+    sequence__span_range *oldspans = sequence__span_range__new();
+    sequence__span_range *newspans = sequence__span_range__new();
+    sequence__span_range *event;
     size_w spanindex;
     size_w remoffset;
     size_w removelen;
@@ -683,7 +715,8 @@ bool sequence__erase_worker(sequence * ps, size_w index, size_w length, sequence
     debug("Erasing: idx=%d len=%d\n", index, length);
 
     // make sure we stay within the range of the sequence
-    if (length == 0 || length > ps->sequence_length || index > ps->sequence_length - length) {
+    if (length == 0 || length > ps->sequence_length ||
+        index > ps->sequence_length - length) {
         sequence__span_range__delete(oldspans);
         sequence__span_range__delete(newspans);
         return false;
@@ -705,7 +738,8 @@ bool sequence__erase_worker(sequence * ps, size_w index, size_w length, sequence
     //  erase+replace operations will pass through here
     //
     if (index == spanindex && sequence__can_optimize(ps, act, index)) {
-        event = sequence__stackback(ps, &(ps->undostack), act == action_replace ? 1 : 0);
+        event = sequence__stackback(ps, &(ps->undostack),
+                                    act == action_replace ? 1 : 0);
         event->length += length;
         append_spanrange = true;
 
@@ -719,7 +753,8 @@ bool sequence__erase_worker(sequence * ps, size_w index, size_w length, sequence
                 return true;
             } else {
                 if (act == action_replace)
-                    sequence__stackback(ps, &(ps->undostack), 0)->last = ps->frag2->next;
+                    sequence__stackback(ps, &(ps->undostack), 0)->last =
+                        ps->frag2->next;
 
                 removelen -= sptr->length;
                 sptr = sptr->next;
@@ -731,7 +766,8 @@ bool sequence__erase_worker(sequence * ps, size_w index, size_w length, sequence
     //  special-case 2: 'backward-delete'
     //  only erase operations can pass through here
     //
-    else if (index + length == spanindex + sptr->length && sequence__can_optimize(ps, action_erase, index + length)) {
+    else if (index + length == spanindex + sptr->length &&
+             sequence__can_optimize(ps, action_erase, index + length)) {
         event = *(sequence__span_range **)vector_back(&(ps->undostack));
         event->length += length;
         event->index -= length;
@@ -769,15 +805,20 @@ bool sequence__erase_worker(sequence * ps, size_w index, size_w length, sequence
     // does the deletion *start* mid-way through a span?
     if (remoffset != 0) {
         // split the span - keep the first "half"
-        sequence__span_range__append(newspans, sequence__span__new(sptr->offset, remoffset, sptr->buffer));
+        sequence__span_range__append(
+            newspans,
+            sequence__span__new(sptr->offset, remoffset, sptr->buffer));
         ps->frag1 = newspans->first;
 
         // have we split a single span into two?
         // i.e. the deletion is completely within a single span
         if (remoffset + removelen < sptr->length) {
             // make a second span for the second half of the split
-            sequence__span_range__append(newspans, sequence__span__new(sptr->offset + remoffset + removelen,
-                    sptr->length - remoffset - removelen, sptr->buffer));
+            sequence__span_range__append(
+                newspans,
+                sequence__span__new(sptr->offset + remoffset + removelen,
+                                    sptr->length - remoffset - removelen,
+                                    sptr->buffer));
 
             ps->frag2 = newspans->last;
         }
@@ -794,8 +835,10 @@ bool sequence__erase_worker(sequence * ps, size_w index, size_w length, sequence
         // will the entire span be removed?
         if (removelen < sptr->length) {
             // split the span, keeping the last "half"
-            sequence__span_range__append(newspans, sequence__span__new(sptr->offset + removelen,
-                    sptr->length - removelen, sptr->buffer));
+            sequence__span_range__append(
+                newspans,
+                sequence__span__new(sptr->offset + removelen,
+                                    sptr->length - removelen, sptr->buffer));
 
             ps->frag2 = newspans->last;
         }
@@ -810,7 +853,8 @@ bool sequence__erase_worker(sequence * ps, size_w index, size_w length, sequence
     // for replace operations, update the undo-event for the
     // insertion so that it knows about the newly removed spans
     if (act == action_replace && !oldspans->boundary)
-        sequence__stackback(ps, &(ps->undostack), 0)->last = oldspans->last->next;
+        sequence__stackback(ps, &(ps->undostack), 0)->last =
+            oldspans->last->next;
 
     sequence__swap_spanrange(ps, oldspans, newspans);
     ps->sequence_length -= length;
@@ -830,7 +874,7 @@ bool sequence__erase_worker(sequence * ps, size_w index, size_w length, sequence
 //
 //  "removes" the specified range of data from the sequence.
 //
-bool sequence__erase_len(sequence * ps, size_w index, size_w len)
+bool sequence__erase_len(sequence *ps, size_w index, size_w len)
 {
     if (sequence__erase_worker(ps, index, len, action_erase)) {
         sequence__record_action(ps, action_erase, index);
@@ -845,7 +889,7 @@ bool sequence__erase_len(sequence * ps, size_w index, size_w len)
 //
 //  remove single character from sequence
 //
-bool sequence__erase(sequence * ps, size_w index)
+bool sequence__erase(sequence *ps, size_w index)
 {
     return sequence__erase_len(ps, index, 1);
 }
@@ -862,7 +906,8 @@ bool sequence__erase(sequence * ps, size_w index)
 //  sequence__erase and sequence__insert and combine them into action. We
 //  need to play with the undo stack to combine them in a 'true' sense.
 //
-bool sequence__replace_buf_erase(sequence * ps, size_w index, const seqchar * buf, size_w length, size_w erase_length)
+bool sequence__replace_buf_erase(sequence *ps, size_w index, const seqchar *buf,
+                                 size_w length, size_w erase_length)
 {
     size_t remlen = 0;
 
@@ -880,7 +925,8 @@ bool sequence__replace_buf_erase(sequence * ps, size_w index, const seqchar * bu
     sequence__group(ps);
 
     // first of all remove the range
-    if (remlen > 0 && index < ps->sequence_length && !sequence__erase_worker(ps, index, remlen, action_replace)) {
+    if (remlen > 0 && index < ps->sequence_length &&
+        !sequence__erase_worker(ps, index, remlen, action_replace)) {
         sequence__ungroup(ps);
         return false;
     }
@@ -894,7 +940,8 @@ bool sequence__replace_buf_erase(sequence * ps, size_w index, const seqchar * bu
         sequence__ungroup(ps);
         sequence__record_action(ps, action_invalid, 0);
 
-        sequence__span_range * range = *(sequence__span_range **)vector_back(&(ps->undostack));
+        sequence__span_range *range =
+            *(sequence__span_range **)vector_back(&(ps->undostack));
         vector_pop_back(&(ps->undostack));
         sequence__restore_spanrange(ps, range, true);
         sequence__span_range__delete(range);
@@ -908,7 +955,8 @@ bool sequence__replace_buf_erase(sequence * ps, size_w index, const seqchar * bu
 //
 //  overwrite with the specified buffer
 //
-bool sequence__replace_buf(sequence * ps, size_w index, const seqchar * buf, size_w length)
+bool sequence__replace_buf(sequence *ps, size_w index, const seqchar *buf,
+                           size_w length)
 {
     return sequence__replace_buf_erase(ps, index, buf, length, length);
 }
@@ -918,7 +966,7 @@ bool sequence__replace_buf(sequence * ps, size_w index, const seqchar * buf, siz
 //
 //  overwrite with a single character-value
 //
-bool sequence__replace(sequence * ps, size_w index, const seqchar val)
+bool sequence__replace(sequence *ps, size_w index, const seqchar val)
 {
     return sequence__replace_buf(ps, index, &val, 1);
 }
@@ -929,7 +977,7 @@ bool sequence__replace(sequence * ps, size_w index, const seqchar val)
 //  very simple wrapper around sequence__insert, just inserts at
 //  the end of the sequence
 //
-bool sequence__append_buf(sequence * ps, const seqchar * buf, size_w length)
+bool sequence__append_buf(sequence *ps, const seqchar *buf, size_w length)
 {
     return sequence__insert_buf(ps, sequence__size(ps), buf, length);
 }
@@ -939,7 +987,7 @@ bool sequence__append_buf(sequence * ps, const seqchar * buf, size_w length)
 //
 //  append a single character to the sequence
 //
-bool sequence__append(sequence * ps, const seqchar val)
+bool sequence__append(sequence *ps, const seqchar val)
 {
     return sequence__append_buf(ps, &val, 1);
 }
@@ -949,9 +997,9 @@ bool sequence__append(sequence * ps, const seqchar val)
 //
 //  empty the entire sequence, clear undo/redo history etc
 //
-bool sequence__clear(sequence * ps)
+bool sequence__clear(sequence *ps)
 {
-    sequence__span * sptr, *tmp;
+    sequence__span *sptr, *tmp;
 
     // delete all spans in the sequence
     for (sptr = ps->head->next; sptr != ps->tail; sptr = tmp) {
@@ -968,8 +1016,10 @@ bool sequence__clear(sequence * ps)
     sequence__clearstack(ps, &(ps->redostack));
 
     // delete all memory-buffers
-    VECTOR_FOR_EACH(&(ps->buffer_list), i) {
-        sequence__buffer_control * psbc = ITERATOR_GET_AS(sequence__buffer_control *, &i);
+    VECTOR_FOR_EACH(&(ps->buffer_list), i)
+    {
+        sequence__buffer_control *psbc =
+            ITERATOR_GET_AS(sequence__buffer_control *, &i);
         free(psbc->buffer);
         free(psbc);
     }
@@ -986,11 +1036,12 @@ bool sequence__clear(sequence * ps)
 //
 //  Returns number of chars copied into destination
 //
-size_w sequence__render(sequence * ps, size_w index, seqchar * dest, size_w length)
+size_w sequence__render(sequence *ps, size_w index, seqchar *dest,
+                        size_w length)
 {
     size_w spanoffset = 0;
     size_w total = 0;
-    sequence__span * sptr;
+    sequence__span *sptr;
 
     // find span to start rendering at
     if ((sptr = sequence__spanfromindex(ps, index, &spanoffset)) == 0)
@@ -1002,10 +1053,12 @@ size_w sequence__render(sequence * ps, size_w index, seqchar * dest, size_w leng
     // copy each span's referenced data in succession
     while (length && sptr != ps->tail) {
         size_w copylen = min(sptr->length - spanoffset, length);
-        sequence__buffer_control * psbc = VECTOR_GET_AS(sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
-        seqchar * source = psbc->buffer;
+        sequence__buffer_control *psbc = VECTOR_GET_AS(
+            sequence__buffer_control *, &(ps->buffer_list), sptr->buffer);
+        seqchar *source = psbc->buffer;
 
-        memcpy(dest, source + sptr->offset + spanoffset, copylen * sizeof(seqchar));
+        memcpy(dest, source + sptr->offset + spanoffset,
+               copylen * sizeof(seqchar));
 
         dest += copylen;
         length -= copylen;
@@ -1023,7 +1076,7 @@ size_w sequence__render(sequence * ps, size_w index, seqchar * dest, size_w leng
 //
 //  return single element at specified position in the sequence
 //
-seqchar sequence__peek(sequence * ps, size_w index)
+seqchar sequence__peek(sequence *ps, size_w index)
 {
     seqchar value;
     return sequence__render(ps, index, &value, 1) ? value : 0;
@@ -1034,7 +1087,7 @@ seqchar sequence__peek(sequence * ps, size_w index)
 //
 //  modify single element at specified position in the sequence
 //
-bool sequence__poke(sequence * ps, size_w index, seqchar value)
+bool sequence__poke(sequence *ps, size_w index, seqchar value)
 {
     return sequence__replace_buf(ps, index, &value, 1);
 }
@@ -1044,7 +1097,7 @@ bool sequence__poke(sequence * ps, size_w index, seqchar value)
 //
 //  readonly array access
 //
-seqchar sequence__operator_char(sequence * ps, size_w index)
+seqchar sequence__operator_char(sequence *ps, size_w index)
 {
     return sequence__peek(ps, index);
 }
@@ -1054,7 +1107,7 @@ seqchar sequence__operator_char(sequence * ps, size_w index)
 //
 //  read/write array access
 //
-sequence__ref * sequence__operator_ref(sequence * ps, size_w index)
+sequence__ref *sequence__operator_ref(sequence *ps, size_w index)
 {
     return sequence__ref__new(ps, index);
 }
@@ -1065,7 +1118,4 @@ sequence__ref * sequence__operator_ref(sequence * ps, size_w index)
 //  Prevent subsequent operations from being optimized (coalesced)
 //  with the last.
 //
-void sequence__breakopt(sequence * ps)
-{
-    ps->lastaction = action_invalid;
-}
+void sequence__breakopt(sequence *ps) { ps->lastaction = action_invalid; }

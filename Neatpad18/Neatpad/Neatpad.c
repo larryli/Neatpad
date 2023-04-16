@@ -66,7 +66,7 @@ void SetWindowFileName(HWND hwnd, TCHAR *szFileName, BOOL fModified)
 //
 //  About dialog-proc
 //
-LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     HICON hIcon;
     HFONT hFont;

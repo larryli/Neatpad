@@ -96,8 +96,8 @@ LONG TextView__OnContextMenu(TEXTVIEW *ptv, HWND hwndParam, int x, int y)
     }
     // PostMessage(m_hWnd, WM_COMMAND, MAKEWPARAM(uCmd, 0), (LPARAM)m_hWnd);
 
-    return DefWindowProc(ptv->m_hWnd, WM_CONTEXTMENU, (WPARAM)hwndParam,
-                         MAKELONG(x, y));
+    // return DefWindowProc(ptv->m_hWnd, WM_CONTEXTMENU, (WPARAM)hwndParam,
+    //                      MAKELONG(x, y));
 }
 
 //

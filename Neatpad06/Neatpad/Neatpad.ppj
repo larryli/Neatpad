@@ -101,6 +101,8 @@ output\OptionsMisc.obj: \
 # 
 output\resource.res: \
 	resource.rc \
+	icon1.ico \
+	icon2.ico \
 	resource.h
 	$(RC) $(RCFLAGS) "$!" -Fo"$@"
 

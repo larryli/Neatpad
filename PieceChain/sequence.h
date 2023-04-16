@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <windows.h>
+
 #include "vector\vector.h"
 
 //
@@ -54,19 +55,19 @@ typedef struct {
     //  Span-table management
     //
     size_w sequence_length;
-    sequence__span * head;
-    sequence__span * tail;
-    sequence__span * frag1;
-    sequence__span * frag2;
+    sequence__span *head;
+    sequence__span *tail;
+    sequence__span *frag1;
+    sequence__span *frag2;
 
-    Vector undostack;           // sequence__span_range *
-    Vector redostack;           // sequence__span_range *
+    Vector undostack; // sequence__span_range *
+    Vector redostack; // sequence__span_range *
     size_t group_id;
     size_t group_refcount;
     size_w undoredo_index;
     size_w undoredo_length;
 
-    Vector buffer_list;         // sequence__buffer_control *
+    Vector buffer_list; // sequence__buffer_control *
     int modifybuffer_id;
     int modifybuffer_pos;
 
@@ -76,20 +77,20 @@ typedef struct {
 } sequence;
 
 // sequence construction
-sequence * sequence__new(void);
+sequence *sequence__new(void);
 void sequence__delete(sequence *);
 
 //
 // initialize with a file
 //
 bool sequence__init(sequence *);
-bool sequence__open(sequence *, TCHAR * filename, bool readonly);
+bool sequence__open(sequence *, TCHAR *filename, bool readonly);
 bool sequence__clear(sequence *);
 
 //
 // initialize from an in-memory buffer
 //
-bool sequence__init_buffer(sequence *, const seqchar * buffer, size_t length);
+bool sequence__init_buffer(sequence *, const seqchar *buffer, size_t length);
 
 //
 //  sequence statistics
@@ -99,16 +100,21 @@ size_w sequence__size(sequence *);
 //
 // sequence manipulation
 //
-bool sequence__insert_buf(sequence *, size_w index, const seqchar * buf, size_w length);
-bool sequence__insert_count(sequence *, size_w index, const seqchar val, size_w count);
+bool sequence__insert_buf(sequence *, size_w index, const seqchar *buf,
+                          size_w length);
+bool sequence__insert_count(sequence *, size_w index, const seqchar val,
+                            size_w count);
 bool sequence__insert(sequence *, size_w index, const seqchar val);
-bool sequence__replace_buf_erase(sequence *, size_w index, const seqchar * buf, size_w length, size_w erase_length);
-bool sequence__replace_buf(sequence *, size_w index, const seqchar * buf, size_w length);
-bool sequence__replace_count(sequence *, size_w index, const seqchar val, size_w count);
+bool sequence__replace_buf_erase(sequence *, size_w index, const seqchar *buf,
+                                 size_w length, size_w erase_length);
+bool sequence__replace_buf(sequence *, size_w index, const seqchar *buf,
+                           size_w length);
+bool sequence__replace_count(sequence *, size_w index, const seqchar val,
+                             size_w count);
 bool sequence__replace(sequence *, size_w index, const seqchar val);
 bool sequence__erase_len(sequence *, size_w index, size_w len);
 bool sequence__erase(sequence *, size_w index);
-bool sequence__append_buf(sequence *, const seqchar * buf, size_w len);
+bool sequence__append_buf(sequence *, const seqchar *buf, size_w len);
 bool sequence__append(sequence *, const seqchar val);
 void sequence__breakopt(sequence *);
 
@@ -121,64 +127,72 @@ bool sequence__canundo(sequence *);
 bool sequence__canredo(sequence *);
 void sequence__group(sequence *);
 void sequence__ungroup(sequence *);
-inline size_w sequence__event_index(sequence * ps)
-{
-    return ps->undoredo_index;
-}
-inline size_w sequence__event_length(sequence * ps)
+inline size_w sequence__event_index(sequence *ps) { return ps->undoredo_index; }
+inline size_w sequence__event_length(sequence *ps)
 {
     return ps->undoredo_length;
 }
 
 // print out the sequence
-void sequence__debug1(sequence * ps);
+void sequence__debug1(sequence *ps);
 void sequence__debug2(sequence *ps);
 
 //
 // access and iteration
 //
-size_w sequence__render(sequence *ps, size_w index, seqchar * buf, size_w len);
+size_w sequence__render(sequence *ps, size_w index, seqchar *buf, size_w len);
 seqchar sequence__peek(sequence *ps, size_w index);
 bool sequence__poke(sequence *ps, size_w index, seqchar val);
 
 seqchar sequence__operator_char(sequence *ps, size_w index);
-sequence__ref * sequence__operator_ref(sequence *ps, size_w index);
+sequence__ref *sequence__operator_ref(sequence *ps, size_w index);
 
-//private:
-//    typedef std::vector<span_range *> eventstack;
-//    typedef std::vector<buffer_control *> bufferlist;
-void sequence__clear_vector_sr(Vector * pv);
-void sequence__clear_vector_bc(Vector * pv);
+// private:
+//     typedef std::vector<span_range *> eventstack;
+//     typedef std::vector<buffer_control *> bufferlist;
+void sequence__clear_vector_sr(Vector *pv);
+void sequence__clear_vector_bc(Vector *pv);
 
 //
 //  Span-table management
 //
-void sequence__deletefromsequence(sequence *ps, sequence__span ** sptr);
-sequence__span * sequence__spanfromindex(sequence *ps, size_w index, size_w * spanindex);
-void sequence__scan(sequence *ps, sequence__span * sptr);
+void sequence__deletefromsequence(sequence *ps, sequence__span **sptr);
+sequence__span *sequence__spanfromindex(sequence *ps, size_w index,
+                                        size_w *spanindex);
+void sequence__scan(sequence *ps, sequence__span *sptr);
 
 //
 //  Undo and redo stacks
 //
-sequence__span_range * sequence__initundo(sequence *ps, size_w index, size_w length, sequence__action act);
-void sequence__restore_spanrange(sequence *ps, sequence__span_range * range, bool undo_or_redo);
-void sequence__swap_spanrange(sequence *ps, sequence__span_range * src, sequence__span_range * dest);
-bool sequence__undoredo(sequence *ps, Vector * source, Vector * dest);    // sequence__span_range *
-void sequence__clearstack(sequence *ps, Vector * source); // sequence__span_range *
-sequence__span_range * sequence__stackback(sequence *ps, Vector * source, size_t idx);    // sequence__span_range *
+sequence__span_range *sequence__initundo(sequence *ps, size_w index,
+                                         size_w length, sequence__action act);
+void sequence__restore_spanrange(sequence *ps, sequence__span_range *range,
+                                 bool undo_or_redo);
+void sequence__swap_spanrange(sequence *ps, sequence__span_range *src,
+                              sequence__span_range *dest);
+bool sequence__undoredo(sequence *ps, Vector *source,
+                        Vector *dest); // sequence__span_range *
+void sequence__clearstack(sequence *ps,
+                          Vector *source); // sequence__span_range *
+sequence__span_range *sequence__stackback(sequence *ps, Vector *source,
+                                          size_t idx); // sequence__span_range *
 
 //
 //  File and memory buffer management
 //
-sequence__buffer_control * sequence__alloc_buffer(sequence *ps, size_t size);
-sequence__buffer_control * sequence__alloc_modifybuffer(sequence *ps, size_t size);
-bool sequence__import_buffer(sequence *ps, const seqchar * buf, size_t len, size_t * buffer_offset);
+sequence__buffer_control *sequence__alloc_buffer(sequence *ps, size_t size);
+sequence__buffer_control *sequence__alloc_modifybuffer(sequence *ps,
+                                                       size_t size);
+bool sequence__import_buffer(sequence *ps, const seqchar *buf, size_t len,
+                             size_t *buffer_offset);
 
 //
 //  Sequence manipulation
 //
-bool sequence__insert_worker(sequence *ps, size_w index, const seqchar * buf, size_w len, sequence__action act);
-bool sequence__erase_worker(sequence *ps, size_w index, size_w len, sequence__action act);
+bool sequence__insert_worker(sequence *ps, size_w index, const seqchar *buf,
+                             size_w len, sequence__action act);
+bool sequence__erase_worker(sequence *ps, size_w index, size_w len,
+                            sequence__action act);
 bool sequence__can_optimize(sequence *ps, sequence__action act, size_w index);
 void sequence__record_action(sequence *ps, sequence__action act, size_w index);
 
@@ -191,8 +205,8 @@ void sequence__UNLOCK(sequence *ps);
 //  private class to the sequence
 //
 struct sequence__span {
-    sequence__span * next;
-    sequence__span * prev;      // double-link-list
+    sequence__span *next;
+    sequence__span *prev; // double-link-list
 
     size_w offset;
     size_w length;
@@ -201,10 +215,11 @@ struct sequence__span {
     int id;
 };
 
-inline sequence__span * sequence__span__new_nx_pr(size_w off, size_w len, int buf, sequence__span * nx,
-    sequence__span * pr)
+inline sequence__span *sequence__span__new_nx_pr(size_w off, size_w len,
+                                                 int buf, sequence__span *nx,
+                                                 sequence__span *pr)
 {
-    sequence__span * pss = malloc(sizeof(sequence__span));
+    sequence__span *pss = malloc(sizeof(sequence__span));
     if (pss == NULL)
         return NULL;
     pss->offset = off;
@@ -217,29 +232,27 @@ inline sequence__span * sequence__span__new_nx_pr(size_w off, size_w len, int bu
     return pss;
 }
 
-inline sequence__span * sequence__span__new(size_w off, size_w len, int buf)
+inline sequence__span *sequence__span__new(size_w off, size_w len, int buf)
 {
     return sequence__span__new_nx_pr(off, len, buf, NULL, NULL);
 }
 
-inline void sequence__span__delete(sequence__span * pss)
-{
-    free(pss);
-}
+inline void sequence__span__delete(sequence__span *pss) { free(pss); }
 
 //
 //  sequence__span_range
 //
 //  private class to the sequence. Used to represent a contiguous range of
-//spans.    used by the undo/redo stacks to store state. A span-range effectively
-//represents    the range of spans affected by an event (operation) on the sequence
+// spans.    used by the undo/redo stacks to store state. A span-range
+// effectively represents    the range of spans affected by an event (operation)
+// on the sequence
 //
 //
 struct sequence__span_range {
     // private:
     // the span range
-    sequence__span * first;
-    sequence__span * last;
+    sequence__span *first;
+    sequence__span *last;
     bool boundary;
 
     // sequence state
@@ -251,12 +264,14 @@ struct sequence__span_range {
     size_t group_id;
 };
 
-//public:
-// constructor
-inline sequence__span_range * sequence__span_range__new_(size_w seqlen, size_w idx, size_w len,
-    sequence__action a, bool qs, size_t id)
+// public:
+//  constructor
+inline sequence__span_range *sequence__span_range__new_(size_w seqlen,
+                                                        size_w idx, size_w len,
+                                                        sequence__action a,
+                                                        bool qs, size_t id)
 {
-    sequence__span_range * pssr = malloc(sizeof(sequence__span_range));
+    sequence__span_range *pssr = malloc(sizeof(sequence__span_range));
     if (pssr == NULL)
         return NULL;
     pssr->first = NULL;
@@ -271,7 +286,7 @@ inline sequence__span_range * sequence__span_range__new_(size_w seqlen, size_w i
     return pssr;
 }
 
-inline sequence__span_range * sequence__span_range__new(void)
+inline sequence__span_range *sequence__span_range__new(void)
 {
     return sequence__span_range__new_(0, 0, 0, action_invalid, false, 0);
 }
@@ -280,19 +295,20 @@ inline sequence__span_range * sequence__span_range__new(void)
 // to free the contents when the span_range is deleted. e.g. when
 // the span_range is just a temporary helper object. The contents
 // must be deleted manually with span_range::free
-inline void sequence__span_range__delete(sequence__span_range * pssr)
+inline void sequence__span_range__delete(sequence__span_range *pssr)
 {
     free(pssr);
 }
 
 // separate 'destruction' used when appropriate
-inline void sequence__span_range__free(sequence__span_range * pssr)
+inline void sequence__span_range__free(sequence__span_range *pssr)
 {
-    sequence__span * sptr, *next, *term;
+    sequence__span *sptr, *next, *term;
 
     if (pssr->boundary == false) {
         // delete the range of spans
-        for (sptr = pssr->first, term = pssr->last->next; sptr && sptr != term; sptr = next) {
+        for (sptr = pssr->first, term = pssr->last->next; sptr && sptr != term;
+             sptr = next) {
             next = sptr->next;
             sequence__span__delete(sptr);
         }
@@ -300,7 +316,8 @@ inline void sequence__span_range__free(sequence__span_range * pssr)
 }
 
 // add a span into the range
-inline void sequence__span_range__append(sequence__span_range * pssr, sequence__span * sptr)
+inline void sequence__span_range__append(sequence__span_range *pssr,
+                                         sequence__span *sptr)
 {
     if (sptr != 0) {
         // first time a span has been added?
@@ -319,7 +336,8 @@ inline void sequence__span_range__append(sequence__span_range * pssr, sequence__
 }
 
 // join two span-ranges together
-inline void sequence__span_range__append_range(sequence__span_range * pssr, sequence__span_range * range)
+inline void sequence__span_range__append_range(sequence__span_range *pssr,
+                                               sequence__span_range *range)
 {
     if (range->boundary == false) {
         if (pssr->boundary) {
@@ -335,7 +353,8 @@ inline void sequence__span_range__append_range(sequence__span_range * pssr, sequ
 }
 
 // join two span-ranges together. used only for 'back-delete'
-inline void sequence__span_range__prepend(sequence__span_range * pssr, sequence__span_range * range)
+inline void sequence__span_range__prepend(sequence__span_range *pssr,
+                                          sequence__span_range *range)
 {
     if (range->boundary == false) {
         if (pssr->boundary) {
@@ -353,8 +372,9 @@ inline void sequence__span_range__prepend(sequence__span_range * pssr, sequence_
 // An 'empty' range is represented by storing pointers to the
 // spans ***either side*** of the span-boundary position. Input is
 // always the span following the boundary.
-inline void sequence__span_range__spanboundary(sequence__span_range * pssr, sequence__span * before,
-    sequence__span * after)
+inline void sequence__span_range__spanboundary(sequence__span_range *pssr,
+                                               sequence__span *before,
+                                               sequence__span *after)
 {
     pssr->first = before;
     pssr->last = after;
@@ -368,15 +388,15 @@ inline void sequence__span_range__spanboundary(sequence__span_range * pssr, sequ
 //  non-const array access with sequence::operator[]
 //
 struct sequence__ref {
-    //private:
+    // private:
     size_w index;
-    sequence * seq;
+    sequence *seq;
 };
 
-//public:
-inline sequence__ref * sequence__ref__new(sequence * s, size_w i)
+// public:
+inline sequence__ref *sequence__ref__new(sequence *s, size_w i)
 {
-    sequence__ref * psr = malloc(sizeof(sequence__ref));
+    sequence__ref *psr = malloc(sizeof(sequence__ref));
     if (psr == NULL)
         return NULL;
     psr->seq = s;
@@ -384,17 +404,14 @@ inline sequence__ref * sequence__ref__new(sequence * s, size_w i)
     return psr;
 }
 
-inline void sequence__ref__delete(sequence__ref * psr)
-{
-    free(psr);
-}
+inline void sequence__ref__delete(sequence__ref *psr) { free(psr); }
 
-inline seqchar sequence__ref__seqchar(sequence__ref * psr)
+inline seqchar sequence__ref__seqchar(sequence__ref *psr)
 {
     return sequence__peek(psr->seq, psr->index);
 }
 
-inline sequence__ref * sequence__ref__is(sequence__ref * psr, seqchar rhs)
+inline sequence__ref *sequence__ref__is(sequence__ref *psr, seqchar rhs)
 {
     sequence__poke(psr->seq, psr->index, rhs);
     return psr;
@@ -404,7 +421,7 @@ inline sequence__ref * sequence__ref__is(sequence__ref * psr, seqchar rhs)
 //  buffer_control
 //
 struct sequence__buffer_control {
-    seqchar * buffer;
+    seqchar *buffer;
     size_w length;
     size_w maxsize;
     int id;

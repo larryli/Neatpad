@@ -67,6 +67,9 @@ void Machine(TCHAR *str, int len, int initialState)
                 status = testOutRange;
 
             break;
+
+        default:
+            break;
         }
 
         if (status == testNone)

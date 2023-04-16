@@ -23,7 +23,7 @@ static HFONT g_hBoldFont;
 static HFONT g_hNormalFont;
 static HICON g_hIcon2; // TrueType icon
 static HICON g_hIcon3; // OpenType icon
-static int g_nFontHeight;
+// static int g_nFontHeight;
 
 static COLORREF g_crPreviewFG;
 static COLORREF g_crPreviewBG;

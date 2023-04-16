@@ -11,19 +11,20 @@ typedef struct {
     HFONT m_hFont2;
 } SpanView;
 
-//public:
+// public:
 SpanView *SpanView__new(HWND hwnd, sequence *s);
 void SpanView__delete(SpanView *);
 
-void SpanView__DrawSpan(SpanView *, HDC hdc, int *x, int *y, sequence__span *sptr, SIZE *szOut);
-void SpanView__DrawSpan2(SpanView *, HDC hdc, int *x, int *y, WCHAR *buf, int len, int type,
-               COLORREF col, SIZE *szOut);
+void SpanView__DrawSpan(SpanView *, HDC hdc, int *x, int *y,
+                        sequence__span *sptr, SIZE *szOut);
+void SpanView__DrawSpan2(SpanView *, HDC hdc, int *x, int *y, WCHAR *buf,
+                         int len, int type, COLORREF col, SIZE *szOut);
 LONG SpanView__OnPaint(SpanView *);
 
-LRESULT SpanView__SpanViewWndProc(SpanView *, UINT msg, WPARAM wParam, LPARAM lParam);
+LRESULT SpanView__SpanViewWndProc(SpanView *, UINT msg, WPARAM wParam,
+                                  LPARAM lParam);
 static LRESULT WINAPI SpanViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
                                       LPARAM lParam);
-
 
 typedef struct {
     HWND m_hWnd;
@@ -45,16 +46,16 @@ typedef struct {
     sequence *m_seq;
 } UniView;
 
-//public:
+// public:
 UniView *UniView__new(HWND hwnd, sequence *s);
 void SpanView__delete(SpanView *psv);
 LRESULT UniView__WndProc(UniView *, UINT msg, WPARAM wParam, LPARAM lParam);
 
-//private:
+// private:
 USPDATA *UniView__GetUspData(UniView *, HDC hdc);
 int UniView__ApplyFormatting(UniView *, WCHAR *wstr, int wlen, ATTR *attrList);
-void UniView__Uniscribe_MouseXToOffset(UniView *, HWND hwnd, int mouseX, int *charpos,
-                              int *snappedToX);
+void UniView__Uniscribe_MouseXToOffset(UniView *, HWND hwnd, int mouseX,
+                                       int *charpos, int *snappedToX);
 
 void UniView__PaintWnd(UniView *);
 void UniView__MouseMove(UniView *, int x, int y);

@@ -8,25 +8,25 @@
 #define UNICODE
 #define _UNICODE
 
-#include <windows.h>
 #include <tchar.h>
+#include <windows.h>
+
+#include "UspLib\UspLib.h"
 #include "resource.h"
 #include "sequence.h"
-#include "UspLib\UspLib.h"
 
 #pragma comment(lib, "usp10.lib")
 #pragma comment(lib, "usplib/usplib.lib")
 #pragma comment(lib, "vector/vector.lib")
 
-sequence * g_seq;
+sequence *g_seq;
 
 HWND hwndMain;
 HWND hwndUniView;
 HWND hwndSpanView;
 
 HFONT g_hFont;
-LOGFONT g_LogFont = {
-0};
+LOGFONT g_LogFont = {0};
 // TEXTMETRIC   g_textMetric;
 // int          g_nLineHeight;
 
@@ -36,8 +36,8 @@ TCHAR szAppName[] = _T("Piece Chain Demo");
 
 #define MAX_STRING_LEN 100
 
-HWND CreateSpanView(HWND hwndParent, sequence * seq);
-HWND CreateUniView(HWND hwndParent, sequence * seq);
+HWND CreateSpanView(HWND hwndParent, sequence *seq);
+HWND CreateUniView(HWND hwndParent, sequence *seq);
 
 #define INITIAL_TEXT L"Hello World"
 // #define INITIAL_TEXT L"Hello\x64a\x64f\x633\x627\x648\x650\x64aWorld"
@@ -45,10 +45,9 @@ HWND CreateUniView(HWND hwndParent, sequence * seq);
 //
 //  Display the font-chooser dialog
 //
-BOOL GetFont(HWND hwndParent, LOGFONT * logfont)
+BOOL GetFont(HWND hwndParent, LOGFONT *logfont)
 {
-    CHOOSEFONT cf = {
-    sizeof(cf)};
+    CHOOSEFONT cf = {sizeof(cf)};
 
     cf.hwndOwner = hwndParent;
     cf.lpLogFont = logfont;
@@ -88,7 +87,8 @@ LRESULT WINAPI WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         GetWindowRect(hwndUniView, &rect);
         height2 = rect.bottom - rect.top;
         MoveWindow(hwndUniView, 0, 0, width, height2, TRUE);
-        MoveWindow(hwndSpanView, 0, height2 + 2, width, height - height2 - 2, TRUE);
+        MoveWindow(hwndSpanView, 0, height2 + 2, width, height - height2 - 2,
+                   TRUE);
         InvalidateRect(hwndSpanView, 0, 0);
         return 0;
 
@@ -124,9 +124,11 @@ LRESULT WINAPI WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         case IDM_FILE_ABOUT:
 
-            MessageBox(hwnd, _T("Piece Chain Demo\r\n\r\nCopyright(c) 2006 by ")
-                _T("Catch22 Productions.\r\nWritten by J ")
-                _T("Brown.\r\n\r\nHompage at www.catch22.net"), _T("Piece Chain Demo"), MB_ICONINFORMATION);
+            MessageBox(hwnd,
+                       _T("Piece Chain Demo\r\n\r\nCopyright(c) 2006 by ")
+                       _T("Catch22 Productions.\r\nWritten by J ")
+                       _T("Brown.\r\n\r\nHompage at www.catch22.net"),
+                       _T("Piece Chain Demo"), MB_ICONINFORMATION);
             return 0;
 
         // Quit :)
@@ -151,7 +153,7 @@ ATOM InitMainWnd(void)
     wc.hInstance = GetModuleHandle(0);
     wc.hIcon = LoadIcon(0, MAKEINTRESOURCE(IDI_APPLICATION));
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH) (COLOR_3DFACE + 1);
+    wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
     wc.lpszMenuName = MAKEINTRESOURCE(IDR_MENU1);
     wc.lpszClassName = szAppName;
     wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
@@ -159,7 +161,8 @@ ATOM InitMainWnd(void)
     return RegisterClassEx(&wc);
 }
 
-int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int iShowCmd)
+int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine,
+                   int iShowCmd)
 {
     MSG msg;
     SCRIPT_DIGITSUBSTITUTE scriptDigitSubstitute;
@@ -176,15 +179,16 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int iShowC
     //  Create main window
     //
     hwndMain = CreateWindowEx(0, szAppName, // window class name
-        szAppName,              // window caption
-        WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, CW_USEDEFAULT,   // initial x position
-        CW_USEDEFAULT,          // initial y position
-        800,                    // initial x size
-        800,                    // initial y size
-        NULL,                   // parent window handle
-        NULL,                   // use window class menu
-        hInst,                  // program instance handle
-        NULL);                  // creation parameters
+                              szAppName,    // window caption
+                              WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
+                              CW_USEDEFAULT, // initial x position
+                              CW_USEDEFAULT, // initial y position
+                              800,           // initial x size
+                              800,           // initial y size
+                              NULL,          // parent window handle
+                              NULL,          // use window class menu
+                              hInst,         // program instance handle
+                              NULL);         // creation parameters
 
     //
     //  Initialize the font

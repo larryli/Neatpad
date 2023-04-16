@@ -60,7 +60,7 @@ static BOOL ExpandTabs(USPDATA *uspData, WCHAR *wstr, int wlen,
     int xpos = tabdef->iTabOrigin;
     int tabidx = 0;
     int tabWidth;
-    int tab;
+    int tab = 0;
 
     // calculate average character-width
     int charWidth = uspData->uspFontList

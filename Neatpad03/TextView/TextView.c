@@ -9,7 +9,6 @@
 #include <tchar.h>
 #include <windows.h>
 
-
 #include "TextView.h"
 #include "TextViewInternal.h"
 

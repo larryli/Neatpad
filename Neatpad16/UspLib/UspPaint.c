@@ -62,7 +62,7 @@ static void GetGlyphClusterIndices(ITEM_RUN *itemRun, WORD *clusterList,
 //
 //	Draw a rectangle in a single colour. Depending on the run-direction
 //(left/right), 	the rectangle's position may need to be mirrored within the
-//run before output
+// run before output
 //
 static void PaintRectBG(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, int xpos,
                         RECT *rect, ATTR *attr)
@@ -205,7 +205,7 @@ static void PaintItemRunForeground(USPDATA *uspData, USPFONT *uspFont,
     int glyphIdx2;
     int runWidth;
     int runDir = 1;
-    UINT oldMode;
+    UINT oldMode = 0;
 
     // make pointers to the run's various glyph buffers
     ATTR *attrList = uspData->attrList + itemRun->charPos;
@@ -269,7 +269,7 @@ static void PaintItemRunForeground(USPDATA *uspData, USPFONT *uspFont,
 //
 static BOOL CanSkip(USPDATA *uspData, int i, BOOL forcesel)
 {
-    BOOL canSkip = FALSE;
+    // BOOL canSkip = FALSE;
 
     if (i > 0 && i < uspData->itemRunCount - 1) {
         ITEM_RUN *prevRun = GetItemRun(uspData, i - 1);

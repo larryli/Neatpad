@@ -52,13 +52,13 @@ POC_PROJECT_ZIPEXTRA = #
 Neatpad.exe: \
 	output\Neatpad.obj \
 	output\NeatUtils.obj \
+	output\OpenSave.obj \
 	output\Options.obj \
 	output\OptionsDisplay.obj \
 	output\OptionsFont.obj \
 	output\OptionsMisc.obj \
 	output\Printing.obj \
 	output\resource.res \
-	output\OpenSave.obj \
 	output\Search.obj \
 	output\Toolbars.obj
 	$(LINK) $(LINKFLAGS) -out:"$@" $**
@@ -131,6 +131,14 @@ output\Printing.obj: \
 # 
 output\resource.res: \
 	resource.rc \
+	bitmap1.bmp \
+	bitmap3.bmp \
+	bitmap4.bmp \
+	icon1.ico \
+	icon2.ico \
+	icon3.ico \
+	icon4.ico \
+	Neatpad.exe.manifest \
 	resource.h
 	$(RC) $(RCFLAGS) "$!" -Fo"$@"
 

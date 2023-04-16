@@ -48,7 +48,7 @@ LONG TextView__OnPaint(TEXTVIEW *ptv)
 //	Emulates ExtTextOut, but draws text using tabs using TabbedTextOut
 //
 void TextView__TabbedExtTextOut(TEXTVIEW *ptv, HDC hdc, RECT *rect, TCHAR *buf,
-                                 int len)
+                                int len)
 {
     int tab = 4 * ptv->m_nFontWidth;
     int width;

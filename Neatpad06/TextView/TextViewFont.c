@@ -257,7 +257,7 @@ LONG TextView__AddFont(TEXTVIEW *ptv, HFONT hFont)
 }
 
 //
-//	Wptv->m_SETFONT handler: set a new default font
+//	WM_SETFONT handler: set a new default font
 //
 LONG TextView__OnSetFont(TEXTVIEW *ptv, HFONT hFont)
 {

@@ -10,9 +10,10 @@
 #define UNICODE
 #define _UNICODE
 
+#include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
-#include <tchar.h>
+
 #include "resource.h"
 #include "sequence.h"
 #include "spanview.h"
@@ -22,9 +23,9 @@
 #define XBORDER 10
 #define YBORDER 10
 
-UniView * UniView__new(HWND hwnd, sequence * s)
+UniView *UniView__new(HWND hwnd, sequence *s)
 {
-    UniView * puv = malloc(sizeof(UniView));
+    UniView *puv = malloc(sizeof(UniView));
     if (puv == NULL)
         return NULL;
     puv->m_hWnd = hwnd;
@@ -42,18 +43,16 @@ UniView * UniView__new(HWND hwnd, sequence * s)
     return puv;
 }
 
-void UniView__delete(UniView * puv)
-{
-    free(puv);
-}
+void UniView__delete(UniView *puv) { free(puv); }
 
-void UniView__ReposCaret(UniView * puv, ULONG offset, BOOL fTrailing)
+void UniView__ReposCaret(UniView *puv, ULONG offset, BOOL fTrailing)
 {
     HDC hdc = GetDC(puv->m_hWnd);
     int x;
 
     if (fTrailing)
-        UspOffsetToX(UniView__GetUspData(puv, hdc), puv->m_nCurPos - 1, TRUE, &x);
+        UspOffsetToX(UniView__GetUspData(puv, hdc), puv->m_nCurPos - 1, TRUE,
+                     &x);
     else
         UspOffsetToX(UniView__GetUspData(puv, hdc), puv->m_nCurPos, FALSE, &x);
 
@@ -67,23 +66,25 @@ void UniView__ReposCaret(UniView * puv, ULONG offset, BOOL fTrailing)
     }
 }
 
-void UniView__SetFont(UniView * puv, HFONT hFont)
+void UniView__SetFont(UniView *puv, HFONT hFont)
 {
     HDC hdc = GetDC(puv->m_hWnd);
     RECT rect;
 
     puv->m_uspFontList[0].hFont = hFont;
     UspInitFont(&puv->m_uspFontList[0], hdc, hFont);
-    puv->m_nLineHeight = puv->m_uspFontList[0].tm.tmHeight + puv->m_uspFontList[0].tm.tmExternalLeading;
+    puv->m_nLineHeight = puv->m_uspFontList[0].tm.tmHeight +
+                         puv->m_uspFontList[0].tm.tmExternalLeading;
 
     ReleaseDC(puv->m_hWnd, hdc);
 
     GetWindowRect(puv->m_hWnd, &rect);
     SetWindowPos(puv->m_hWnd, 0, 0, 0, rect.right - rect.left,
-        puv->m_nLineHeight + YBORDER * 3, SWP_NOMOVE | SWP_NOZORDER);
+                 puv->m_nLineHeight + YBORDER * 3, SWP_NOMOVE | SWP_NOZORDER);
 }
 
-int UniView__ApplyFormatting(UniView * puv, WCHAR * wstr, int wlen, ATTR * attrList)
+int UniView__ApplyFormatting(UniView *puv, WCHAR *wstr, int wlen,
+                             ATTR *attrList)
 {
     int i;
     int s1 = min(puv->m_nSelStart, puv->m_nSelEnd);
@@ -108,19 +109,18 @@ int UniView__ApplyFormatting(UniView * puv, WCHAR * wstr, int wlen, ATTR * attrL
     return 0;
 }
 
-USPDATA * UniView__GetUspData(UniView * puv, HDC hdc)
+USPDATA *UniView__GetUspData(UniView *puv, HDC hdc)
 {
-    SCRIPT_CONTROL sc = {
-    0};
-    SCRIPT_STATE ss = {
-    0};
+    SCRIPT_CONTROL sc = {0};
+    SCRIPT_STATE ss = {0};
 
     WCHAR wstr[100] = L"";
     int wlen = min(100, sequence__size(puv->m_seq));
 
     sequence__render(puv->m_seq, 0, wstr, wlen);
 
-    UspAnalyze(puv->m_uspData, hdc, wstr, wlen, 0, 0, puv->m_uspFontList, &sc, &ss, 0);
+    UspAnalyze(puv->m_uspData, hdc, wstr, wlen, 0, 0, puv->m_uspFontList, &sc,
+               &ss, 0);
     UspApplySelection(puv->m_uspData, puv->m_nSelStart, puv->m_nSelEnd);
 
     return puv->m_uspData;
@@ -130,23 +130,25 @@ USPDATA * UniView__GetUspData(UniView * puv, HDC hdc)
 //  Map mouse-x coordinate to a character-offset and return x-coord
 //  of selected character
 //
-void UniView__Uniscribe_MouseXToOffset(UniView * puv, HWND hwnd, int mouseX, int *charpos, int *snappedToX)
+void UniView__Uniscribe_MouseXToOffset(UniView *puv, HWND hwnd, int mouseX,
+                                       int *charpos, int *snappedToX)
 {
     HDC hdc = GetDC(hwnd);
-    UspSnapXToOffset(UniView__GetUspData(puv, hdc), mouseX, snappedToX, charpos, 0);
+    UspSnapXToOffset(UniView__GetUspData(puv, hdc), mouseX, snappedToX, charpos,
+                     0);
     ReleaseDC(hwnd, hdc);
 }
 
 //
 //  Display the string
 //
-void UniView__PaintWnd(UniView * puv)
+void UniView__PaintWnd(UniView *puv)
 {
     PAINTSTRUCT ps;
     RECT rect;
     HDC hdcMem;
     HBITMAP hbmMem;
-    USPDATA * uspData;
+    USPDATA *uspData;
 
     BeginPaint(puv->m_hWnd, &ps);
     GetClientRect(puv->m_hWnd, &rect);
@@ -178,9 +180,10 @@ void UniView__PaintWnd(UniView * puv)
 //
 //  Left mouse-down handler
 //
-void UniView__LButtonDown(UniView * puv, int x, int y)
+void UniView__LButtonDown(UniView *puv, int x, int y)
 {
-    UniView__Uniscribe_MouseXToOffset(puv, puv->m_hWnd, x - XBORDER, &puv->m_nCurPos, &x);
+    UniView__Uniscribe_MouseXToOffset(puv, puv->m_hWnd, x - XBORDER,
+                                      &puv->m_nCurPos, &x);
 
     puv->m_nSelStart = puv->m_nCurPos;
     puv->m_nSelEnd = puv->m_nCurPos;
@@ -195,7 +198,7 @@ void UniView__LButtonDown(UniView * puv, int x, int y)
     PostMessage(GetParent(puv->m_hWnd), WM_USER, 0, 0);
 }
 
-void UniView__LButtonDblClick(UniView * puv, int x, int y)
+void UniView__LButtonDblClick(UniView *puv, int x, int y)
 {
     puv->m_nSelStart = 0;
     puv->m_nSelEnd = sequence__size(puv->m_seq);
@@ -208,10 +211,11 @@ void UniView__LButtonDblClick(UniView * puv, int x, int y)
 //
 //  mouse-move handler
 //
-void UniView__MouseMove(UniView * puv, int x, int y)
+void UniView__MouseMove(UniView *puv, int x, int y)
 {
     if (puv->m_fMouseDown) {
-        UniView__Uniscribe_MouseXToOffset(puv, puv->m_hWnd, x - XBORDER, &puv->m_nCurPos, &x);
+        UniView__Uniscribe_MouseXToOffset(puv, puv->m_hWnd, x - XBORDER,
+                                          &puv->m_nCurPos, &x);
 
         puv->m_nSelEnd = puv->m_nCurPos;
 
@@ -225,7 +229,7 @@ void UniView__MouseMove(UniView * puv, int x, int y)
 //
 //  mouse-up handler
 //
-void UniView__LButtonUp(UniView * puv, int x, int y)
+void UniView__LButtonUp(UniView *puv, int x, int y)
 {
     ReleaseCapture();
     puv->m_fMouseDown = FALSE;
@@ -233,10 +237,10 @@ void UniView__LButtonUp(UniView * puv, int x, int y)
 
 bool IsKeyPressed(UINT uVK)
 {
-    return(GetKeyState(uVK) & 0x80000000) ? true : false;
+    return (GetKeyState(uVK) & 0x80000000) ? true : false;
 }
 
-void UniView__KeyDown(UniView * puv, UINT nKey, UINT nFlags)
+void UniView__KeyDown(UniView *puv, UINT nKey, UINT nFlags)
 {
     int s1 = min(puv->m_nSelStart, puv->m_nSelEnd);
     int s2 = max(puv->m_nSelStart, puv->m_nSelEnd);
@@ -362,7 +366,7 @@ repos:
     UniView__ReposCaret(puv, puv->m_nCurPos, puv->m_fTrailing);
 }
 
-void UniView__CharInput(UniView * puv, UINT uChar, DWORD flags)
+void UniView__CharInput(UniView *puv, UINT uChar, DWORD flags)
 {
     int s1 = min(puv->m_nSelStart, puv->m_nSelEnd);
     int s2 = max(puv->m_nSelStart, puv->m_nSelEnd);
@@ -371,7 +375,8 @@ void UniView__CharInput(UniView * puv, UINT uChar, DWORD flags)
     if (uChar < 32)
         return;
 
-    BOOL fReplaceSelection = (puv->m_nSelStart == puv->m_nSelEnd) ? FALSE : TRUE;
+    BOOL fReplaceSelection =
+        (puv->m_nSelStart == puv->m_nSelEnd) ? FALSE : TRUE;
 
     if (fReplaceSelection) {
         // if(!puv->m_fInsertMode) s2--;
@@ -380,7 +385,7 @@ void UniView__CharInput(UniView * puv, UINT uChar, DWORD flags)
         puv->m_nCurPos = s1;
     }
 
-    if (puv->m_fInsertMode)     // && !fReplaceSelection)
+    if (puv->m_fInsertMode) // && !fReplaceSelection)
     {
         sequence__insert(puv->m_seq, puv->m_nCurPos, ch);
     } else {
@@ -408,7 +413,7 @@ void UniView__CharInput(UniView * puv, UINT uChar, DWORD flags)
 //
 //  Main window procedure
 //
-LRESULT UniView__WndProc(UniView * puv, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT UniView__WndProc(UniView *puv, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg) {
     case WM_CREATE:
@@ -432,7 +437,8 @@ LRESULT UniView__WndProc(UniView * puv, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
 
     case WM_LBUTTONDBLCLK:
-        UniView__LButtonDblClick(puv, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        UniView__LButtonDblClick(puv, GET_X_LPARAM(lParam),
+                                 GET_Y_LPARAM(lParam));
         return 0;
 
     case WM_LBUTTONDOWN:
@@ -471,11 +477,13 @@ LRESULT UniView__WndProc(UniView * puv, UINT msg, WPARAM wParam, LPARAM lParam)
 
 LRESULT WINAPI UniViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    UniView * uvptr = (UniView *)GetWindowLongPtr(hwnd, 0);
+    UniView *uvptr = (UniView *)GetWindowLongPtr(hwnd, 0);
 
     switch (msg) {
     case WM_NCCREATE:
-        if ((uvptr = UniView__new(hwnd, (sequence *) ((CREATESTRUCT *)lParam)->lpCreateParams)) == 0)
+        if ((uvptr = UniView__new(
+                 hwnd, (sequence *)((CREATESTRUCT *)lParam)->lpCreateParams)) ==
+            0)
             return FALSE;
 
         SetWindowLongPtr(hwnd, 0, (LONG_PTR)uvptr);
@@ -519,9 +527,11 @@ ATOM InitUniView(void)
 //
 //  Create the unicode viewer
 //
-HWND CreateUniView(HWND hwndParent, sequence * seq)
+HWND CreateUniView(HWND hwndParent, sequence *seq)
 {
     InitUniView();
 
-    return CreateWindowEx(WS_EX_CLIENTEDGE, UNIVIEWCLASS, 0, WS_VISIBLE | WS_CHILD, 0, 0, 0, 0, hwndParent, 0, 0, seq);
+    return CreateWindowEx(WS_EX_CLIENTEDGE, UNIVIEWCLASS, 0,
+                          WS_VISIBLE | WS_CHILD, 0, 0, 0, 0, hwndParent, 0, 0,
+                          seq);
 }

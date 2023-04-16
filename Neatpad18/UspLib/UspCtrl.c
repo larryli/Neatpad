@@ -241,7 +241,7 @@ static WCHAR *CtrlStr(DWORD ch, int mode, WCHAR *buf, size_t len)
         ctrlstr = CtrlStrRep(ch);
 
         if (ctrlstr)
-            swprintf(buf, len, L"%s", ctrlstr);
+            swprintf(buf, len, L"%ls", ctrlstr);
         else
             swprintf(buf, len, L"%02X", ch);
         break;

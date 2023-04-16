@@ -12,6 +12,7 @@
 
 #include <tchar.h>
 #include <windows.h>
+
 #include "SpanView.h"
 
 // using namespace Gdiplus;
@@ -20,33 +21,35 @@
 #define MOD_COLOR RGB(255, 220, 250)
 #define OTHER_COLOR RGB(230, 230, 230)
 
-SpanView * SpanView__new(HWND hwnd, sequence * s)
+SpanView *SpanView__new(HWND hwnd, sequence *s)
 {
-    SpanView * psv = malloc(sizeof(SpanView));
+    SpanView *psv = malloc(sizeof(SpanView));
     if (psv == NULL)
         return NULL;
     psv->m_hWnd = hwnd;
     psv->m_seq = s;
-    psv->m_hFont = CreateFont(28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _T("Tahoma"));
-    psv->m_hFont2 = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _T("Tahoma"));
+    psv->m_hFont =
+        CreateFont(28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _T("Tahoma"));
+    psv->m_hFont2 =
+        CreateFont(14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _T("Tahoma"));
     return psv;
 }
 
-void SpanView__delete(SpanView * psv)
+void SpanView__delete(SpanView *psv)
 {
     DeleteObject(psv->m_hFont);
     DeleteObject(psv->m_hFont2);
     free(psv);
 }
 
-void PaintRect(HDC hdc, RECT * rect, COLORREF fill)
+void PaintRect(HDC hdc, RECT *rect, COLORREF fill)
 {
     fill = SetBkColor(hdc, fill);
     ExtTextOut(hdc, 0, 0, ETO_OPAQUE, rect, 0, 0, 0);
     SetBkColor(hdc, fill);
 }
 
-void DrawEndThing(HDC hdc, RECT * rect, COLORREF fg, COLORREF bg, int id)
+void DrawEndThing(HDC hdc, RECT *rect, COLORREF fg, COLORREF bg, int id)
 {
     POINT pt[5];
     HPEN hpen, holdpen;
@@ -90,7 +93,8 @@ void DrawEndThing(HDC hdc, RECT * rect, COLORREF fg, COLORREF bg, int id)
     DeleteObject(hbr);
 }
 
-void DrawShadowRect(HDC hdc, int x, int y, RECT * rect, WCHAR * buf, int len, COLORREF col)
+void DrawShadowRect(HDC hdc, int x, int y, RECT *rect, WCHAR *buf, int len,
+                    COLORREF col)
 {
     RECT rc = *rect;
 
@@ -106,8 +110,8 @@ void DrawShadowRect(HDC hdc, int x, int y, RECT * rect, WCHAR * buf, int len, CO
     TextOut(hdc, x, y, buf, len);
 }
 
-void SpanView__DrawSpan2(SpanView * psv, HDC hdc, int *x, int *y, WCHAR * buf, int len, int type,
-    COLORREF col, SIZE * szOut)
+void SpanView__DrawSpan2(SpanView *psv, HDC hdc, int *x, int *y, WCHAR *buf,
+                         int len, int type, COLORREF col, SIZE *szOut)
 {
     SIZE sz;
     RECT rc;
@@ -148,16 +152,17 @@ void SpanView__DrawSpan2(SpanView * psv, HDC hdc, int *x, int *y, WCHAR * buf, i
     szOut->cy = rc.bottom - rc.top;
 }
 
-void SpanView__DrawSpan(SpanView * psv, HDC hdc, int *x, int *y, sequence__span * sptr, SIZE * szOut)
+void SpanView__DrawSpan(SpanView *psv, HDC hdc, int *x, int *y,
+                        sequence__span *sptr, SIZE *szOut)
 {
     SIZE sz1;
     SIZE sz2;
     COLORREF col;
 
     WCHAR buf[100] = L"";
-    sequence__buffer_control * psbc = VECTOR_GET_AS(sequence__buffer_control *, &(psv->m_seq->buffer_list),
-        sptr->buffer);
-    WCHAR * src = psbc->buffer + sptr->offset;
+    sequence__buffer_control *psbc = VECTOR_GET_AS(
+        sequence__buffer_control *, &(psv->m_seq->buffer_list), sptr->buffer);
+    WCHAR *src = psbc->buffer + sptr->offset;
 
     if (src && sptr->id > 2)
         swprintf(buf, 100, _T("%.*ls"), sptr->length, src);
@@ -171,10 +176,12 @@ void SpanView__DrawSpan(SpanView * psv, HDC hdc, int *x, int *y, sequence__span 
 
     if (sptr->id < 0) {
         SelectObject(hdc, psv->m_hFont);
-        SpanView__DrawSpan2(psv, hdc, x, y, L"X", 1, sptr->id, OTHER_COLOR, &sz1);
+        SpanView__DrawSpan2(psv, hdc, x, y, L"X", 1, sptr->id, OTHER_COLOR,
+                            &sz1);
     } else {
         SelectObject(hdc, psv->m_hFont);
-        SpanView__DrawSpan2(psv, hdc, x, y, src, sptr->length, sptr->id, col, &sz1);
+        SpanView__DrawSpan2(psv, hdc, x, y, src, sptr->length, sptr->id, col,
+                            &sz1);
     }
 
     SelectObject(hdc, psv->m_hFont2);
@@ -183,20 +190,21 @@ void SpanView__DrawSpan(SpanView * psv, HDC hdc, int *x, int *y, sequence__span 
     GetTextExtentPoint32(hdc, buf, lstrlen(buf), &sz2);
 
     if (sptr->id >= 0)
-        TextOut(hdc, *x + (sz1.cx - sz2.cx) / 2, *y + 8 + sz1.cy, buf, lstrlen(buf));
+        TextOut(hdc, *x + (sz1.cx - sz2.cx) / 2, *y + 8 + sz1.cy, buf,
+                lstrlen(buf));
 
     *szOut = sz1;
     szOut->cy += sz2.cy;
 }
 
-LONG SpanView__OnPaint(SpanView * psv)
+LONG SpanView__OnPaint(SpanView *psv)
 {
     PAINTSTRUCT ps;
     BeginPaint(psv->m_hWnd, &ps);
 
     RECT rect;
     WCHAR buf[20];
-    int tablist = 4;
+    // int tablist = 4;
 
     GetClientRect(psv->m_hWnd, &rect);
     psv->m_nWrapWidth = rect.right - rect.left;
@@ -205,7 +213,7 @@ LONG SpanView__OnPaint(SpanView * psv)
     HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, rect.right, rect.bottom);
     SelectObject(hdcMem, hbmMem);
 
-    sequence__span * sptr;
+    sequence__span *sptr;
     SIZE sz, sz2;
 
     int x = 10, y = 10, i;
@@ -213,10 +221,11 @@ LONG SpanView__OnPaint(SpanView * psv)
     FillRect(hdcMem, &rect, GetSysColorBrush(COLOR_WINDOW));
 
     SelectObject(hdcMem, psv->m_hFont);
-    sequence__buffer_control * bufctrl = 0;
+    sequence__buffer_control *bufctrl = 0;
 
     if (psv->m_seq->buffer_list.size > 1)
-        bufctrl = VECTOR_GET_AS(sequence__buffer_control *, &(psv->m_seq->buffer_list), 1);
+        bufctrl = VECTOR_GET_AS(sequence__buffer_control *,
+                                &(psv->m_seq->buffer_list), 1);
 
     if (bufctrl && bufctrl->buffer) {
         SelectObject(hdcMem, psv->m_hFont2);
@@ -225,7 +234,8 @@ LONG SpanView__OnPaint(SpanView * psv)
         y += sz2.cy + 2;
 
         SelectObject(hdcMem, psv->m_hFont);
-        SpanView__DrawSpan2(psv, hdcMem, &x, &y, bufctrl->buffer, bufctrl->length, 3, ORIG_COLOR, &sz);
+        SpanView__DrawSpan2(psv, hdcMem, &x, &y, bufctrl->buffer,
+                            bufctrl->length, 3, ORIG_COLOR, &sz);
         y += sz.cy + 30;
         x = 10;
     }
@@ -258,12 +268,14 @@ LONG SpanView__OnPaint(SpanView * psv)
     SelectObject(hdcMem, psv->m_hFont);
 
     if (psv->m_seq->buffer_list.size > 2)
-        bufctrl = VECTOR_GET_AS(sequence__buffer_control *, &(psv->m_seq->buffer_list), 2);
+        bufctrl = VECTOR_GET_AS(sequence__buffer_control *,
+                                &(psv->m_seq->buffer_list), 2);
     else
         bufctrl = 0;
 
     if (bufctrl && bufctrl->buffer) {
-        SpanView__DrawSpan2(psv, hdcMem, &x, &y, bufctrl->buffer, bufctrl->length, 3, MOD_COLOR, &sz);
+        SpanView__DrawSpan2(psv, hdcMem, &x, &y, bufctrl->buffer,
+                            bufctrl->length, 3, MOD_COLOR, &sz);
         y += sz.cy + 50;
         x = 10;
     }
@@ -274,7 +286,8 @@ LONG SpanView__OnPaint(SpanView * psv)
     y += sz2.cy;
 
     for (i = psv->m_seq->undostack.size - 1; i >= 0; i--) {
-        sequence__span_range * range = VECTOR_GET_AS(sequence__span_range *, &(psv->m_seq->undostack), i);
+        sequence__span_range *range =
+            VECTOR_GET_AS(sequence__span_range *, &(psv->m_seq->undostack), i);
 
         x = 10;
         SelectObject(hdcMem, psv->m_hFont);
@@ -282,7 +295,8 @@ LONG SpanView__OnPaint(SpanView * psv)
         TextOut(hdcMem, x, y + 4, buf, lstrlen(buf));
         x += 30;
         if (range->boundary == false) {
-            for (sptr = range->first; sptr != range->last->next; sptr = sptr->next) {
+            for (sptr = range->first; sptr != range->last->next;
+                 sptr = sptr->next) {
                 SpanView__DrawSpan(psv, hdcMem, &x, &y, sptr, &sz);
                 x += sz.cx + 10;
             }
@@ -310,6 +324,9 @@ LONG SpanView__OnPaint(SpanView * psv)
         case action_replace:
             TextOut(hdcMem, x, y + 4, L"(replace)", 9);
             break;
+
+        default:
+            break;
         }
 
         y += sz.cy + 20;
@@ -325,7 +342,8 @@ LONG SpanView__OnPaint(SpanView * psv)
 //
 //  SpanView private window procedure
 //
-LRESULT SpanView__SpanViewWndProc(SpanView * psv, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT SpanView__SpanViewWndProc(SpanView *psv, UINT msg, WPARAM wParam,
+                                  LPARAM lParam)
 {
     switch (msg) {
     case WM_PAINT:
@@ -341,9 +359,10 @@ LRESULT SpanView__SpanViewWndProc(SpanView * psv, UINT msg, WPARAM wParam, LPARA
 //
 //
 //
-static LRESULT WINAPI SpanViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+static LRESULT WINAPI SpanViewWndProc(HWND hwnd, UINT msg, WPARAM wParam,
+                                      LPARAM lParam)
 {
-    SpanView * svptr = (SpanView *)GetWindowLongPtr(hwnd, 0);
+    SpanView *svptr = (SpanView *)GetWindowLongPtr(hwnd, 0);
     PVOID p;
 
     switch (msg) {
@@ -377,7 +396,7 @@ ATOM InitSpanView(void)
     wc.hInstance = GetModuleHandle(0);
     wc.hIcon = 0;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.lpszMenuName = 0;
     wc.lpszClassName = _T("SpanView");
     wc.hIconSm = 0;
@@ -385,10 +404,11 @@ ATOM InitSpanView(void)
     return RegisterClassEx(&wc);
 }
 
-HWND CreateSpanView(HWND hwndParent, sequence * seq)
+HWND CreateSpanView(HWND hwndParent, sequence *seq)
 {
     InitSpanView();
 
     return CreateWindowEx(WS_EX_CLIENTEDGE, _T("SpanView"), 0,
-        WS_VISIBLE | WS_CHILD, 0, 0, 0, 0, hwndParent, 0, 0, (LPVOID)seq);
+                          WS_VISIBLE | WS_CHILD, 0, 0, 0, 0, hwndParent, 0, 0,
+                          (LPVOID)seq);
 }
